@@ -1,0 +1,47 @@
+.form-control {
+    margin: 1rem 0;
+  }
+  
+  .form-control label,
+  .form-control input,
+  .form-control textarea {
+    display: block;
+    font-size: large;
+    font-family: "Roboto, Arial, Helvetica, sans-serif";
+  }
+  
+  .form-control label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-control input,
+  .form-control textarea {
+    width: 90%;
+    font-size: large;
+    font-family: "Roboto, Arial, Helvetica, sans-serif";
+    border: 1px solid #ccc;
+    background: #f8f8f8;
+    padding: .5rem 0.5rem;
+    box-shadow: 1px 1px 1px rgba(4, 53, 4, 0.3);
+  }
+  
+  .form-control input:focus,
+  .form-control textarea:focus {
+    outline: none;
+    background: #ebebeb;
+    border-color: #510077;
+  }
+  
+  .form-control--invalid label,
+  .form-control--invalid p {
+    color: red;
+    font-size: large;
+    font-family: "Roboto, Arial, Helvetica, sans-serif";
+  }
+  
+  .form-control--invalid input,
+  .form-control--invalid textarea {
+    border-color: red;
+    background: #ffd1d1;
+  }

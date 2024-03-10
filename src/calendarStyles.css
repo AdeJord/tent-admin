@@ -1,0 +1,187 @@
+.free {
+  background-color: #a8dba8; /* A soft green */
+  color: black;
+}
+
+.booked {
+  background-color: #cf7a7a; /* A softer, lighter red */
+  color: black;
+}
+
+.customCalendar {
+  width: 900%; /* Set to full width of its container */
+  max-width: 90vw; /* 90% of the viewport width */
+  min-width: 300px; /* Minimum width you want your calendar to have */
+  height: auto;
+  font-size: 1em; /* Responsive font size */
+  background-color: #9fbb9f;
+  border-radius: 10px;
+}
+
+.react-calendar__month-view__days__day {
+  height: 40px; /* Adjust based on your calendar size */
+  width: 40px; /* Should be equal to height for a perfect circle */
+}
+
+.react-calendar__month-view__days__day.not-operational {
+  background-color: #d3d3d3; /* A neutral grey color */
+}
+
+.react-calendar__tile--active {
+  background-color: blue; /* Example color for the active day */
+}
+
+/* Styles for booked, free, and not-operational days */
+.booked,
+.free,
+.not-operational {
+  border-radius: 50%; /* Ensure these also are circular */
+}
+
+/* Style for greyed-out tiles not in the current month */
+.not-current-month {
+  opacity: 0.5;
+}
+
+/* Hide year navigation buttons */
+.react-calendar__navigation__next2-button,
+.react-calendar__navigation__prev2-button {
+  display: none;
+}
+
+.react-calendar__navigation__next-button,
+.react-calendar__navigation__prev-button {
+  font-size: 1em; /* Start with a default size */
+  padding: 10px;
+}
+
+.custom-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em; /* Adjust the size as needed */
+}
+
+.custom-navigation > button {
+  margin: 0 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.custom-navigation > button.current-month {
+  font-size: 2em; /* or any other size */
+  font-weight: 300;
+}
+
+/* Styles for the current month name */
+.custom-navigation > button:nth-child(2) {
+  font-size: 1.2em; /* Larger font size for the current month */
+}
+
+/* Media queries for different viewport widths */
+@media (min-width: 768px) {
+  .customCalendar {
+    font-size: 1.2em; /* Increase font size on larger screens */
+  }
+
+  .react-calendar__navigation__next-button,
+  .react-calendar__navigation__prev-button {
+    font-size: 1.2em; /* Increase button size on larger screens */
+  }
+
+  .custom-navigation {
+    font-size: 1.2em; /* Increase font size for navigation on larger screens */
+  }
+
+  .custom-navigation > button:nth-child(2) {
+    font-size: 1.5em; /* Even larger font size for the current month on larger screens */
+  }
+}
+
+@media (min-width: 1024px) {
+  .customCalendar {
+    font-size: 1.5em; /* Further increase font size on even larger screens */
+  }
+}
+
+/* Ensure tiles are square for all screens */
+.react-calendar__tile {
+  height: 3.5em; /* Example fixed size */
+  width: 3em; /* Should be the same as height */
+  margin: 2em; /* Adds space between tiles (DOES NOT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)*/
+  border-radius: 5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Additional styles for the .free, .booked, and .not-operational classes */
+.free,
+.booked,
+.not-operational {
+  border-radius: 50%; /* Ensures the custom styles don't override the circular shape */
+}
+
+.calendar-key {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.key-item {
+  display: flex;
+  align-items: center;
+  margin-right: 20px; /* Space between items */
+}
+
+.key-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%; /* Makes the key color indicators round */
+  margin-right: 10px; /* Space between color indicator and text */
+}
+
+.key-color.free {
+  background-color: #a8dba8; /* Same color as your .free class */
+}
+.key-color.booked {
+  background-color: #cf7a7a; /* Same color as your .booked class */
+}
+
+.key-color.not-operational {
+  background-color: #d3d3d3; /* A neutral color for not operational, adjust as needed */
+  color: black;
+}
+
+.key-text {
+  font-size: 1em; /* Adjust as needed */
+}
+
+.key-text.free {
+  color: #a8dba8; /* Same color as your .free class */
+}
+
+.key-text.booked {
+  color: #cf7a7a; /* Same color as your .booked class */
+}
+
+/* Styles for not-operational days */
+.not-operational {
+  background-color: #d3d3d3; /* A neutral grey color */
+}
+
+.not-current-month {
+  opacity: 0.5; /* Or use another method to grey out, like changing the background color */
+  /* Additional styling as needed */
+}
+
+.react-calendar {
+  width: 100%;
+  max-width: auto; /* Prevents the calendar from overflowing the parent container */
+  padding: 25px;
+}
+
+.react-calendar__month-view {
+  margin: auto;
+}
