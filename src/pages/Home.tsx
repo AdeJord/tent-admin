@@ -22,6 +22,14 @@ function Home() {
                     <Link style={{ textDecoration: 'none' }} to='/AddVolunteers'>Add A Volunteer</Link>
                 </ContainerPartition>
             </Container>
+            <Container>
+                <ContainerPartition>
+                    <Link style={{ textDecoration: 'none' }} to="/AvailabilityCalendar">Edit News</Link>
+                </ContainerPartition>
+                <ContainerPartition>
+                    <Link style={{ textDecoration: 'none' }} to='/AddNews'>Add News</Link>
+                </ContainerPartition>
+            </Container>
         </Root>
     );
 }

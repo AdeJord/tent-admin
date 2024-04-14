@@ -1,14 +1,13 @@
 import React from 'react'
 
-//THIS WILL BE IN THE FORM OF A MODAL WHICH SHOWS WHEN EDIT BUTTON IS CLICKED ON A BOOKINGimport React from "react";
-import { Root, FormRoot, FormContainer } from "../styles";
+//THIS WILL BE IN THE FORM OF A MODAL WHICH SHOWS WHEN EDIT BUTTON IS CLICKED ON A BOOKING
+import { Root, FormRoot, FormContainer } from "./src/styles";
 import { format } from 'date-fns';
 import axios from "axios";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-//ADD POTSAL ADDRESS TO FORM
 
 interface FormData {
   first_name: string;
@@ -60,7 +59,7 @@ const schema = yup.object().shape({
 });
 
 
-const editBooking: React.FC = () => {
+const EditBooking: React.FC = () => {
 
   // Function to send data to the createBooking endpoint
   const submitBooking: SubmitHandler<FormData> = async (data) => {
@@ -69,12 +68,12 @@ const editBooking: React.FC = () => {
     // data.booking_date = formattedDate;
 
     try {
-      const response = await axios.post("https://adejord.co.ukcreateBooking", data);
+      const response = await axios.post("https://adejord.co.uk/createBooking", data);
 
-      console.log("Booking created successfully:", response.data);
+      console.log("Booking updated successfully:", response.data);
       // You can perform additional actions after a successful booking creation here
     } catch (error) {
-      console.error("Error creating booking:", error);
+      console.error("Error updating booking:", error);
       // Handle error scenarios here
     }
   };
@@ -255,4 +254,4 @@ const editBooking: React.FC = () => {
   );
 };
 
-export default editBooking;
+export default EditBooking;

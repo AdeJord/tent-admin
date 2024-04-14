@@ -46,7 +46,10 @@ const AvailabilityCalendar: React.FC = () => {
       .then(response => response.json())
       .then(data => setBookedDates(data))
       .catch(error => console.error('Error fetching data: ', error));
+      console.log(bookedDates);
   }, []);
+
+
 
   // This function converts a date to a YYYY-MM-DD string in local time
   function toLocalDateString(date: Date) {
@@ -74,10 +77,6 @@ const AvailabilityCalendar: React.FC = () => {
       console.log('This date is booked and cannot be selected.');
     }
   };
-  
-  
-  
-  
   
   return (
     <Root style={{ paddingTop: '10vh' }}>

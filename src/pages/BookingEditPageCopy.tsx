@@ -61,7 +61,7 @@ const schema = yup.object().shape({
 });
 
 
-const editBooking: React.FC = () => {
+const EditBooking: React.FC = () => {
 
   // Function to send data to the createBooking endpoint
   const submitBooking: SubmitHandler<FormData> = async (data) => {
@@ -256,4 +256,4 @@ const editBooking: React.FC = () => {
   );
 };
 
-export default editBooking;
+export default EditBooking;

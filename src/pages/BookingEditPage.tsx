@@ -9,18 +9,29 @@ import { set } from 'date-fns';
 
 const BASE_URL = 'https://adejord.co.uk'; // Replace with your API base URL
 
-// Define the fetchBookingData function
+// Define the fetchBookingData function DOES NOT SEEM TO BE WORKING
 const fetchBookingData = async (bookingId: any) => {
+
     try {
-        const response = await axios.get(`${BASE_URL}/bookings/${bookingId}`);
+
+        if (isNaN(bookingId)) {
+            console.log('Invalid booking ID:', bookingId);
+            return;
+        }
+        // Parse bookingId to integer if your database expects an integer
+        const id = parseInt(bookingId, 10); 
+        const response = await axios.get(`${BASE_URL}/getBookingById/${id}`);
+        console.log('response:', response.data);
+        console.log('Booking ID:', id);
         return response.data;
     } catch (error) {
+        console.log('Error fetching booking data:', error);
         throw error;
     }
 };
 
 // Function to update booking data by bookingId
-export const updateBookingData = async (bookingId: any, formData: any) => {
+export const updateBookingData = async (bookingId: number, formData: any) => {
     try {
         const response = await axios.patch(`${BASE_URL}/updateBooking/${bookingId}`, formData);
         return response.data;
@@ -30,6 +41,7 @@ export const updateBookingData = async (bookingId: any, formData: any) => {
     }
 };
 
+// Function to delete booking data by bookingId
 const deleteBookingData = async (bookingId: any) => {
     try {
         const response = await axios.delete(`${BASE_URL}/deleteBooking/${bookingId}`);
@@ -47,27 +59,25 @@ const BookingEditPage = () => {
     const [showSuccessDeleteModal, setShowSuccessDeleteModal] = useState(false);
 
     const [formData, setFormData] = useState({
-        first_name: '',
-        surname: '',
-        group_name: '',
-        contact_number: '',
-        email_address: '',
-        house_number: '',
-        street_name: '',
-        city: '',
-        postcode: '',
-        booking_date: '',
-        total_passengers: '',
-        wheelchair_users: '',
-        smoking: '',
-        destination: '',
-        lunch_arrangements: '',
-        notes: '',
-        terms_and_conditions: '',
-        group_leader_policy: '',
-        bookingMonth: '',
-
-        // Add other fields here
+        first_name: "",
+        surname: "",
+        group_name: "",
+        contact_number: "",
+        email_address: "",
+        house_number: "",
+        street_name: "",
+        city: "",
+        postcode: "",
+        booking_date: "",
+        total_passengers: "",
+        wheelchair_users: "",
+        smoking: "",
+        destination: "",
+        lunch_arrangements: "",
+        notes: "",
+        terms_and_conditions: "",
+        group_leader_policy: "",
+        bookingMonth: "",
     });
 
     // Fetch booking data based on bookingId (useEffect to fetch data when the component mounts)
@@ -86,6 +96,8 @@ const BookingEditPage = () => {
             });
     }, [bookingId]);
 
+    console.log('formData:', formData);
+
     // Handle form input changes
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -100,12 +112,25 @@ const BookingEditPage = () => {
     // Handle form submission (you can customize this part based on your API)
     const handleSubmit = (e: { preventDefault: () => void; }) => {
         e.preventDefault();
-        updateBookingData(bookingId, formData)
+        updateBookingData(Number(bookingId), formData)
             .then(() => {
                 setShowSuccessModal(true); // Show the success modal on successful update
             })
             .catch((error) => {
-                console.error(error);
+                console.error("Error in BookingEditPage:", error.message);
+                if (error.response) {
+                    // The request was made and the server responded with a status code
+                    // that falls out of the range of 2xx
+                    console.error("Response data:", error.response.data);
+                    console.error("Response status:", error.response.status);
+                    console.error("Response headers:", error.response.headers);
+                } else if (error.request) {
+                    // The request was made but no response was received
+                    console.error("No response received:", error.request);
+                } else {
+                    // Something happened in setting up the request that triggered an Error
+                    console.error("Error message:", error.message);
+                }
                 setShowDangerModal(true); // Show the danger modal on error
             });
     };
@@ -123,7 +148,10 @@ const BookingEditPage = () => {
 
     const handleDangerModalDeleteClick = () => {
         deleteBookingData(bookingId)
+
+
             .then(() => {
+                console.log('Booking delete started')
                 // Delete operation succeeded
                 setShowDangerModal(false); // Close the delete modal
                 setShowSuccessDeleteModal(true); // Show the success modal
@@ -156,7 +184,6 @@ const BookingEditPage = () => {
                             header="Update Submitted"
                             content="Booking has been updated"
                             footer="Thank you"
-                            // Assuming your Modal component can accept an onClick prop
                             onClick={handleUpdateSuccessModalClick}
                         />
                     </Backdrop>

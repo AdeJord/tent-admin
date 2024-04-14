@@ -9,6 +9,7 @@ import {
 } from "../styles";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { log } from "console";
 
 // Define an interface for the booking object
 interface Booking {
@@ -71,7 +72,7 @@ const AllBookings = () => {
 
 
   useEffect(() => {
-    // console.log("fetch started"); // Log the start of function
+    console.log("fetch all bookings started"); // Log the start of function
     axios
       .get("https://adejord.co.uk/bookings")
       .then((response) => {
@@ -83,8 +84,18 @@ const AllBookings = () => {
         console.error("Error fetching data:", error);
         console.error('Error details:', error.response);
       });
+
+    // function to log the type of data of the id
+    // const logType = (id: any) => {
+    //   console.log(typeof id);
+    // };
+    // { logType(data[0].id) }  // Number
+
+
     // { console.log(getBookingsForMonth(targetMonth)) }
   }, [targetMonth]);
+
+
 
 
   const handlePrevMonth = () => {
@@ -283,7 +294,7 @@ const AllBookings = () => {
                       cursor: "pointer",
                     }}
                   >
-                    <Link to={`/editBooking/${item.id}`}> {/* Use item.id instead of index */}
+                    <Link to={`/editBooking/${item.id}`}>
                       EDIT
                     </Link>
                   </td>
