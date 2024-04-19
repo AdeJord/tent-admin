@@ -63,7 +63,7 @@ const AddVolunteers: React.FC = () => {
   // Function to send data to the addVolunteer endpoint
   const submitVolunteer: SubmitHandler<FormData> = async (data) => {
     try {
-      const response = await axios.post("https://adejord.co.uk/addVolunteer", data);
+      const response = await axios.post("https://adejord.co.uk/addVolunteers", data);
 
       // console.log("Booking created successfully:", response.data);
       setFormData(data);

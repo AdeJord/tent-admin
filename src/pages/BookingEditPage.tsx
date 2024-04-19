@@ -6,8 +6,11 @@ import DangerModal from '../components/modal/DangerModal';
 import Backdrop from '../components/modal/ModalBackdrop';
 import { Root, FormRoot, FormContainer, Button, ButtonContainer } from '../styles';
 import { set } from 'date-fns';
+import Select from 'react-select';
 
 const BASE_URL = 'https://adejord.co.uk'; // Replace with your API base URL
+
+//NEED TO make sure you cant book in past, allow mariel to assign skippers and creww to bookings
 
 // Define the fetchBookingData function DOES NOT SEEM TO BE WORKING
 const fetchBookingData = async (bookingId: any) => {
@@ -18,6 +21,7 @@ const fetchBookingData = async (bookingId: any) => {
             console.log('Invalid booking ID:', bookingId);
             return;
         }
+
         // Parse bookingId to integer if your database expects an integer
         const id = parseInt(bookingId, 10); 
         const response = await axios.get(`${BASE_URL}/getBookingById/${id}`);
@@ -30,6 +34,10 @@ const fetchBookingData = async (bookingId: any) => {
     }
 };
 
+
+
+
+
 // Function to update booking data by bookingId
 export const updateBookingData = async (bookingId: number, formData: any) => {
     try {
@@ -40,6 +48,10 @@ export const updateBookingData = async (bookingId: number, formData: any) => {
         throw error;
     }
 };
+
+
+
+
 
 // Function to delete booking data by bookingId
 const deleteBookingData = async (bookingId: any) => {
@@ -384,8 +396,17 @@ const BookingEditPage = () => {
                             value={formData.group_leader_policy ? "Agreed" : "Not Agreed"}
                             onChange={handleInputChange}
                         />
+                        <hr />
                         <br />
+                        <label>Assign Skipper:</label>
+                        <input 
+                        type='dropdown'
+                        />
                         <br />
+                        <hr />
+                        Assign 1st Crew
+                        <br />
+                        <hr />
                         <div
                             style={{
                                 backgroundColor: '#eaf3e7',

@@ -12,17 +12,18 @@ const BASE_URL = 'https://adejord.co.uk'; // Replace with your API base URL
 // Define the fetchBookingData function
 const fetchVolunteerData = async (volunteerId: any) => {
     try {
-        const response = await axios.get(`${BASE_URL}/volunteers/${volunteerId}`);
+        const response = await axios.get(`${BASE_URL}/getVolunteerById/${volunteerId}`);
         return response.data;
     } catch (error) {
+        console.log('error fetching volunteer data')
         throw error;
     }
 };
 
 // Function to update booking data by volunteerId
-export const updateVolunteerData = async (VolunteerId: any, formData: any) => {
+export const updateVolunteerData = async (volunteerId: any, formData: any) => {
     try {
-        const response = await axios.patch(`${BASE_URL}/updateVolunteer/${VolunteerId}`, formData);
+        const response = await axios.patch(`${BASE_URL}/updateVolunteer/${volunteerId}`, formData);
         return response.data;
     } catch (error) {
         console.log('error editing volunteer')
@@ -31,9 +32,9 @@ export const updateVolunteerData = async (VolunteerId: any, formData: any) => {
 };
 
 // Function to delete booking data by bookingId
-const deleteVolunteerData = async (bookingId: any) => {
+const deleteVolunteerData = async (volunteerId: any) => {
     try {
-        const response = await axios.delete(`${BASE_URL}/deleteVolunteer/${bookingId}`);
+        const response = await axios.delete(`${BASE_URL}/deleteVolunteer/${volunteerId}`);
         return response.data;
     } catch (error) {
         throw error;
@@ -92,12 +93,13 @@ const EditVolunteers = () => {
     // Handle form submission (you can customize this part based on your API)
     const handleSubmit = (e: { preventDefault: () => void; }) => {
         e.preventDefault();
-        updateVolunteerData(volunteerId, formData)
+        updateVolunteerData(Number (volunteerId), formData)
             .then(() => {
                 setShowSuccessModal(true); // Show the success modal on successful update
             })
             .catch((error) => {
                 console.error(error);
+                console.log('error updating volunteer (On Submit')
                 setShowDangerModal(true); // Show the danger modal on error
             });
     };

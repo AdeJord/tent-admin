@@ -86,7 +86,7 @@ const AllVolunteers = () => {
                       cursor: "pointer",
                     }}
                   >
-                    <Link to={`/editVolunteer/${item.id}`}> {/* Use item.id instead of index */}
+                    <Link to={`/editVolunteer/${item.id}`}>
                       EDIT
                     </Link>
                   </td>

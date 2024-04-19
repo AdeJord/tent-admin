@@ -95,7 +95,7 @@ export const Header = styled.div`
 `;
 
 export const Container = styled.div`
-  height: 100vh;
+  height: 20vh;
   width: 60vw;
   display: flex;
   flex-direction: row;
@@ -123,7 +123,7 @@ export const ColumnContainer = styled.div`
 `;
 
 export const ContainerPartition = styled.div`
-  height: 30vh;
+  height: 10vh;
   width: 40vw;
   display: flex;
   flex-direction: column;
@@ -217,19 +217,21 @@ export const TableContainer = styled.div`
 `;
 
 export const ModalRoot = styled.div`
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   z-index: 100;
-  height: auto; /* Adjust the height to fit content */
-  width: auto; /* Adjust the width for a less narrow appearance */
+  height: auto; 
+  width: auto; 
   display: flex;
   flex-direction: column;
   align-items: center;
+  left: 50;
+  top: 50;
   font-size: calc(8px + 2vmin);
-  color: #333; /* Softer text color */
+  color: #333; 
   font-family: "Roboto, Arial, Helvetica, sans-serif";
   transition: all 0.3s ease;
   border-radius: 10px; /* Rounded corners */
-  margin-top: -30vh; // Adjust as needed to move the modal up
+  margin-top: -40vh; // Adjust as needed to move the modal up
   background-color: #f8f8f8; /* Softer background color */
 `;
 
@@ -290,7 +292,7 @@ export const DangerModalRoot = styled.div`
   font-family: "Roboto, Arial, Helvetica, sans-serif";
   transition: all 0.3s ease;
   border-radius: 15px; // Soft rounded corners
-  margin-top: -30vh; // Adjust as needed to move the modal up
+  margin-top: -40vh; // Adjust as needed to move the modal up
   margin-left: auto; // Center the modal horizontally
   margin-right: auto; // Center the modal horizontally
   background-color: #ffebee; // Very light red background

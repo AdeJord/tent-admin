@@ -15,6 +15,8 @@ import EditVolunteers from './pages/EditVolunteers';
 import AvailabilityCalendar from './pages/AvailabilityCalendar';
 import ProtectedRoute from './components/ProtectedRoute';
 import AddNews from './pages/AddNews';
+import AllNews from './pages/AllNews';
+import EditNews from './pages/EditNews';
 
 
 
@@ -43,9 +45,10 @@ function App() {
               <Route path='/addvolunteers' element={<ProtectedRoute><AddVolunteers /></ProtectedRoute>} />
               <Route path="/editBooking/:bookingId" element={<ProtectedRoute><BookingEditPage /></ProtectedRoute>} />
               <Route path="/editVolunteer/:volunteerId" element={<ProtectedRoute><EditVolunteers /></ProtectedRoute>} />
-              <Route path='/addnews' element={<ProtectedRoute><AddNews /></ProtectedRoute>} />
+              <Route path='/addNews' element={<ProtectedRoute><AddNews /></ProtectedRoute>} />
+              <Route path='/news' element={<ProtectedRoute><AllNews /></ProtectedRoute>} />
+              <Route path='/editNews/:newsId' element={<ProtectedRoute><EditNews /></ProtectedRoute>} />
               {/* Add more routes here as needed */}
-
               {/* Redirect to Home if no route matches */}
             </>
           ) : (
