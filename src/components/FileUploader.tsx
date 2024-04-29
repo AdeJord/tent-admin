@@ -11,10 +11,10 @@ const BASE_URL = process.env.REACT_APP_API_URL || 'https://adejord.co.uk';
 const uploadFile = async (file: Blob, fileType: FileUploaderProps['fileType']) => {
     
     const formData = new FormData();
-    formData.append('fileType', fileType); // Append fileType to the FormData object
+    formData.append('fileType', fileType); // Append fileType to the FormData object (NEEDS TO BE 1sT)
     formData.append('file', file);
 
-    const uploadUrl = `${BASE_URL}/uploadFile`; // Ensure this endpoint is expecting 'fileType'
+    const uploadUrl = `${BASE_URL}/uploadFile`;
 
     try {
         const response = await axios.post(uploadUrl, formData, {
@@ -33,8 +33,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({ fileType }) => {
         const file = event.target.files?.[0];
         if (file) {
             uploadFile(file, fileType);  // Pass the fileType from props
+            event.target.value = '';  // Reset the file input after upload
         }
     };
+    
 
     return (
         <div style={{
