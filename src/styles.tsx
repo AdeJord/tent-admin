@@ -100,6 +100,7 @@ export const Container = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-evenly;
   font-family: "Roboto, Arial, Helvetica, sans-serif";
 `;
 
@@ -123,6 +124,7 @@ export const ColumnContainer = styled.div`
 `;
 
 export const ContainerPartition = styled.div`
+  borderRadius: 10px;
   height: 10vh;
   width: 40vw;
   display: flex;
@@ -138,6 +140,28 @@ export const ContainerPartition = styled.div`
   &:hover {
     background-color: #eaf3e7;
     color: green;
+  }
+`;
+
+export const UploadDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: gray;
+  color: #051101;
+  font-size: 16px;
+  font-family: "Roboto, Arial, Helvetica, sans-serif";
+  border: 1px solid #051101;
+  border-radius: 5px;
+  padding: 1rem;
+  margin: 0.5rem;
+  width: 10vw;
+  height: 10vh;
+  &:hover {
+    background-color: #eaf3e7;
+    color: #051101;
   }
 `;
 
@@ -328,7 +352,7 @@ export const DangerModalFooter = styled.div`
   border-bottom-right-radius: 15px; // Match DangerModalRoot border radius
 `;
 
- export const AvailabilityCalendarContainer = styled.div`
+export const AvailabilityCalendarContainer = styled.div`
  max-width: 90vw;
  width: 90vw;
  height: 90vh;
