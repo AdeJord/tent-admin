@@ -25,6 +25,8 @@ const SignInPage: React.FC = () => {
     setShowDangerModal(false); // Close the modal
   }
 
+  const modalContent = (`Atemptes remaining: ${3 - failedAttempts}  `);
+
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -67,7 +69,7 @@ const SignInPage: React.FC = () => {
           <DangerModal
             onClick={handleDangerModalCancel}
             header="Incorrect username or password"
-            content="attempts remaining: 3"
+            content={modalContent + "Please try again."}
             footer={<div
               style={{
                 backgroundColor: "#EAF3E7",
@@ -86,9 +88,7 @@ const SignInPage: React.FC = () => {
                   textAlign: "center",
                 }}
               >OK</Button>
-            </div>} onClose={function (): void {
-              // throw new Error('Function not implemented.');
-            }}          />
+            </div>} onClose={handleDangerModalCancel} />
         </Backdrop>
       )}
       {isBlocked && (
@@ -111,7 +111,7 @@ const SignInPage: React.FC = () => {
               >OK</Button>
             </div>} onClose={function (): void {
               throw new Error('Function not implemented.');
-            } }          />
+            }} />
         </Backdrop>
       )}
       <h1>Sign In</h1>
