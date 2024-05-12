@@ -113,6 +113,17 @@ const EditNews = () => {
         setShowDangerModal(false);
     };
 
+    const handleDeleteSuccessModalClick = () => {
+        setShowSuccessModal(false); // Close the modal
+        // setShowSuccessDeleteModal(true); // Show the success modal on successful update
+        navigate(`/`); // Navigate to the desired page
+    }
+
+    const handleCloseModal = () => {
+        setShowDangerModal(false); // Close the modal
+    }
+
+
     // Function to convert file system path to web URL path
     function toWebPath(internalPath: string) {
         if (!internalPath) return '';
@@ -127,7 +138,7 @@ const EditNews = () => {
                     paddingTop: '20px',
                 }}>
                 {showSuccessModal && (
-                    <Backdrop>
+                    <Backdrop onClick={handleCloseModal}>
                         <Modal
                             header="Update Submitted"
                             content="News item has been updated."
@@ -135,21 +146,20 @@ const EditNews = () => {
                     </Backdrop>
                 )}
                 {showDangerModal && (
-                    <Backdrop>
+                    <Backdrop onClick={handleCloseModal}>
                         <DangerModal
                             header="Delete Confirmation"
                             content="Are you sure you want to delete this news item? This action cannot be undone."
-                            footer={
-                                <div>
-                                    <Button onClick={handleDelete}>DELETE</Button>
-                                    <Button onClick={handleCancel}>CANCEL</Button>
+                            footer={<div>
+                                <Button onClick={handleDelete}>DELETE</Button>
+                                <Button onClick={handleCancel}>CANCEL</Button>
 
-                                </div>
-                            }
-
+                            </div>} onClose={function (): void {
+                                throw new Error('Function not implemented.');
+                            } }
                             // footer={<Button onClick={handleDelete}>DELETE</Button>}
 
-                            onClick={() => setShowDangerModal(false)}
+                            // onClick={() => setShowDangerModal(false)}
                         />
 
                     </Backdrop>

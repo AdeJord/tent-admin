@@ -23,7 +23,7 @@ const fetchBookingData = async (bookingId: any) => {
         }
 
         // Parse bookingId to integer if your database expects an integer
-        const id = parseInt(bookingId, 10); 
+        const id = parseInt(bookingId, 10);
         const response = await axios.get(`${BASE_URL}/getBookingById/${id}`);
         console.log('response:', response.data);
         console.log('Booking ID:', id);
@@ -152,15 +152,24 @@ const BookingEditPage = () => {
         setShowDangerModal(true);
     };
 
+    const handleCloseSuccessModal = () => {
+        setShowSuccessModal(false); // Close the modal
+    };
+
     const handleDeleteSuccessModalClick = () => {
         setShowSuccessModal(false); // Close the modal
         setShowSuccessDeleteModal(true); // Show the success modal on successful update
         navigate(`/`); // Navigate to the desired page
-    };
+    }
+
+    const handleCloseDeleteSuccessModal = () => {
+        setShowSuccessDeleteModal(false); // Close the modal
+    }
+
+
 
     const handleDangerModalDeleteClick = () => {
         deleteBookingData(bookingId)
-
 
             .then(() => {
                 console.log('Booking delete started')
@@ -191,7 +200,7 @@ const BookingEditPage = () => {
         <Root>
             <FormRoot>
                 {showSuccessModal && (
-                    <Backdrop>
+                    <Backdrop onClick={handleCloseSuccessModal}> {/* Add this onClick */}
                         <Modal
                             header="Update Submitted"
                             content="Booking has been updated"
@@ -201,42 +210,39 @@ const BookingEditPage = () => {
                     </Backdrop>
                 )}
                 {showSuccessDeleteModal && (
-                    <Backdrop>
+                    <Backdrop onClick={handleCloseDeleteSuccessModal}> {/* Add this onClick */}
                         <Modal
                             header="DELETED"
                             content="Booking has successfully been deleted"
                             footer="Thank you"
-                            // Assuming your Modal component can accept an onClick prop
                             onClick={handleDeleteSuccessModalClick}
                         />
                     </Backdrop>
                 )}
                 {showDangerModal && (
-                    <Backdrop>
+                    <Backdrop onClick={handleCloseSuccessModal}>
                         <DangerModal
-                            onClick={() => setShowDangerModal(false)} // Close the modal when clicked outside
                             header="Delete Confirmation"
                             content="Are you sure you want to delete this booking? (This cannot be undone)"
-                            footer={
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        flexDirection: "row",
-                                    }}>
+                            footer={<div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                }}>
 
-                                    <Button
-                                        onClick={handleDangerModalCancel}
-                                        type="submit"
-                                        style={{ backgroundColor: "#EAF3E7", color: "#051101", fontSize: "calc(5px + 2vmin)" }}
-                                    >CANCEL</Button>
-                                    <Button
-                                        onClick={handleDangerModalDeleteClick}
-                                        type="submit"
-                                        style={{ backgroundColor: "red", color: "#051101", fontSize: "calc(5px + 2vmin)" }}
-                                    >DELETE</Button>
-                                </div>
-                            }
-                        />
+                                <Button
+                                    onClick={handleDangerModalCancel}
+                                    type="submit"
+                                    style={{ backgroundColor: "#EAF3E7", color: "#051101", fontSize: "calc(5px + 2vmin)" }}
+                                >CANCEL</Button>
+                                <Button
+                                    onClick={handleDangerModalDeleteClick}
+                                    type="submit"
+                                    style={{ backgroundColor: "red", color: "#051101", fontSize: "calc(5px + 2vmin)" }}
+                                >DELETE</Button>
+                            </div>} onClose={function (): void {
+                                throw new Error('Function not implemented.');
+                            } }                        />
                     </Backdrop>
                 )}
 
@@ -399,8 +405,8 @@ const BookingEditPage = () => {
                         <hr />
                         <br />
                         <label>Assign Skipper:</label>
-                        <input 
-                        type='dropdown'
+                        <input
+                            type='dropdown'
                         />
                         <br />
                         <hr />

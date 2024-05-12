@@ -145,7 +145,7 @@ const EditVolunteers = () => {
         <Root>
             <FormRoot>
                 {showSuccessModal && (
-                    <Backdrop>
+                    <Backdrop onClick={handleUpdateSuccessModalClick}>
                         <Modal
                             header="Update Submitted"
                             content="Record has been updated"
@@ -156,7 +156,7 @@ const EditVolunteers = () => {
                     </Backdrop>
                 )}
                 {showSuccessDeleteModal && (
-                    <Backdrop>
+                    <Backdrop onClick={handleUpdateSuccessModalClick}>
                         <Modal
                             header="DELETED"
                             content="Volunteer has successfully been deleted"
@@ -167,31 +167,30 @@ const EditVolunteers = () => {
                     </Backdrop>
                 )}
                 {showDangerModal && (
-                    <Backdrop>
+                    <Backdrop onClick={handleDangerModalCancel}>
                         <DangerModal
-                            onClick={() => setShowDangerModal(false)} // Close the modal when clicked outside
+                            onClick={handleDangerModalDeleteClick} // Close the modal when clicked outside
                             header="Delete Confirmation"
                             content="Are you sure you want to delete this volunteer? (this action cannot be undone)"
-                            footer={
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        flexDirection: "row",
-                                    }}>
+                            footer={<div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                }}>
 
-                                    <Button
-                                        onClick={handleDangerModalCancel}
-                                        type="submit"
-                                        style={{ backgroundColor: "#EAF3E7", color: "#051101", fontSize: "calc(5px + 2vmin)" }}
-                                    >CANCEL</Button>
-                                    <Button
-                                        onClick={handleDangerModalDeleteClick}
-                                        type="submit"
-                                        style={{ backgroundColor: "red", color: "#051101", fontSize: "calc(5px + 2vmin)" }}
-                                    >DELETE</Button>
-                                </div>
-                            }
-                        />
+                                <Button
+                                    onClick={handleDangerModalCancel}
+                                    type="submit"
+                                    style={{ backgroundColor: "#EAF3E7", color: "#051101", fontSize: "calc(5px + 2vmin)" }}
+                                >CANCEL</Button>
+                                <Button
+                                    onClick={handleDangerModalDeleteClick}
+                                    type="submit"
+                                    style={{ backgroundColor: "red", color: "#051101", fontSize: "calc(5px + 2vmin)" }}
+                                >DELETE</Button>
+                            </div>} onClose={function (): void {
+                                throw new Error('Function not implemented.');
+                            } }                        />
                     </Backdrop>
                 )}
 

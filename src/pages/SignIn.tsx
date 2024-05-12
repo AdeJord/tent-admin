@@ -62,57 +62,56 @@ const SignInPage: React.FC = () => {
   return (
     <div style={{ paddingTop: '40px', textAlign: 'center' }}>
       {showDangerModal && (
-        <Backdrop>
+        <Backdrop onClick={handleDangerModalCancel}
+        >
           <DangerModal
-            onClick={() => setShowDangerModal(false)} // Close the modal when clicked outside
+            onClick={handleDangerModalCancel}
             header="Incorrect username or password"
-            content="Try Again"
-            footer={
-              <div
+            content="attempts remaining: 3"
+            footer={<div
+              style={{
+                backgroundColor: "#EAF3E7",
+                color: "#051101",
+                fontSize: "calc(5px + 2vmin)",
+                textAlign: "center",
+              }}>
+
+              <Button
+                onClick={handleDangerModalCancel}
+                type="submit"
                 style={{
                   backgroundColor: "#EAF3E7",
                   color: "#051101",
                   fontSize: "calc(5px + 2vmin)",
                   textAlign: "center",
-                }}>
-
-                <Button
-                  onClick={handleDangerModalCancel}
-                  type="submit"
-                  style={{
-                    backgroundColor: "#EAF3E7",
-                    color: "#051101",
-                    fontSize: "calc(5px + 2vmin)",
-                    textAlign: "center",
-                  }}
-                >OK</Button>
-              </div>
-            }
-          />
+                }}
+              >OK</Button>
+            </div>} onClose={function (): void {
+              // throw new Error('Function not implemented.');
+            }}          />
         </Backdrop>
       )}
       {isBlocked && (
-        <Backdrop>
+        <Backdrop onClick={handleDangerModalCancel}>
           <DangerModal
-            onClick={() => setShowDangerModal(false)} // Close the modal when clicked outside
+            onClick={handleDangerModalCancel}
             header="Too many failed attempts"
             content="You are locked out for 30 seconds. Please try again later."
-            footer={
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  textAlign: "center",
-                }}>
+            footer={<div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                textAlign: "center",
+              }}>
 
-                <Button
-                  onClick={handleDangerModalCancel}
-                  type="submit"
-                  style={{ backgroundColor: "#EAF3E7", color: "#051101", fontSize: "calc(5px + 2vmin)" }}
-                >OK</Button>
-              </div>
-            }
-          />
+              <Button
+                onClick={handleDangerModalCancel}
+                type="submit"
+                style={{ backgroundColor: "#EAF3E7", color: "#051101", fontSize: "calc(5px + 2vmin)" }}
+              >OK</Button>
+            </div>} onClose={function (): void {
+              throw new Error('Function not implemented.');
+            } }          />
         </Backdrop>
       )}
       <h1>Sign In</h1>

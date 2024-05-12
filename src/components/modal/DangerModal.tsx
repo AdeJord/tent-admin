@@ -1,44 +1,45 @@
-import { FC, MouseEventHandler, ReactNode, useState } from "react";
-import {
-    Root,
-    DangerModalRoot,
-    DangerModalHeader,
-    DangerModalContent,
-    DangerModalFooter,
-    Button,
-    ButtonContainer
-} from "../../styles";
-import ReactDOM from "react-dom";
-import Modal from "./Modal";
+import React from 'react';
+import styled from 'styled-components';
 
 interface ModalProps {
-    onClick: MouseEventHandler<HTMLDivElement>;
-    header: string;
-    content: ReactNode;
-    footer: ReactNode;
+  header: string;
+  content: string;
+  footer?: React.ReactNode;
+  onClose: () => void;  // Add this line
+  onClick?: () => void;
 }
 
+const ModalWrapper = styled.div`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+`;
 
-const DangerModal: FC<ModalProps> = ({ onClick, header, content, footer }: ModalProps) => {
-    
-    const [modalIsOpen, setModalIsOpen] = useState(false);
-    
-    const modalContent = (
-        <Root>
-            <DangerModalRoot>
-                <div onClick={onClick}>
-                    <div>
-                        <DangerModalHeader><h3>{header}</h3></DangerModalHeader>
-                        <DangerModalContent>{content}</DangerModalContent>
-                        <DangerModalFooter>{footer}</DangerModalFooter>
-                    </div>
-                </div>
-            </DangerModalRoot>
-        </Root>
-    );
+const CloseButton = styled.button`
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  border: none;
+  background: none;
+  font-size: 24px;
+  cursor: pointer;
+`;
 
-    return ReactDOM.createPortal(modalContent, document.getElementById('modal-hook')!);
+const DangerModal: React.FC<ModalProps> = ({ header, content, footer, onClose }) => {
+  return (
+    <ModalWrapper>
+      <CloseButton onClick={onClose}>&times;</CloseButton>
+      <h2>{header}</h2>
+      <p>{content}</p>
+      {footer}
+    </ModalWrapper>
+  );
 };
-
 
 export default DangerModal;

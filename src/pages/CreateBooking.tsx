@@ -269,7 +269,7 @@ const CreateBooking: React.FC = () => {
     <FormRoot>
       {showModal && (
         <>
-          <Backdrop>
+          <Backdrop onClick={ModalClickHandler}>
             <Modal
               onClick={ModalClickHandler}
               header="Booking Submitted"
