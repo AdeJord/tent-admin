@@ -19,8 +19,12 @@ const fetchNewsData = async (newsId: string) => {
     }
 };
 
+
+//ISSUE IS HERE
 const updateNewsData = async (newsId: string | undefined, formData: { title: string; content: string; image_path: string; date: string; }) => {
     try {
+        console.log(`News id = ${BASE_URL}/updateNews/${newsId}`)
+
         const response = await axios.patch(`${BASE_URL}/updateNews/${newsId}`, formData);
         return response.data;
     } catch (error) {
@@ -31,6 +35,8 @@ const updateNewsData = async (newsId: string | undefined, formData: { title: str
 
 const deleteNewsData = async (newsId: string | undefined) => {
     try {
+        console.log(`News id = ${BASE_URL}/updateNews/${newsId}`)
+
         const response = await axios.delete(`${BASE_URL}/news/${newsId}`);
         return response.data;
     } catch (error) {
@@ -103,6 +109,17 @@ const EditNews = () => {
             });
     };
 
+    const handleCancel = () => {    
+        setShowDangerModal(false);
+    };
+
+    // Function to convert file system path to web URL path
+    function toWebPath(internalPath: string) {
+        if (!internalPath) return '';
+        return internalPath.replace('/var/www', '');
+    }
+
+
     return (
         <Root>
             <FormRoot
@@ -122,7 +139,16 @@ const EditNews = () => {
                         <DangerModal
                             header="Delete Confirmation"
                             content="Are you sure you want to delete this news item? This action cannot be undone."
-                            footer={<Button onClick={handleDelete}>DELETE</Button>}
+                            footer={
+                                <div>
+                                    <Button onClick={handleDelete}>DELETE</Button>
+                                    <Button onClick={handleCancel}>CANCEL</Button>
+
+                                </div>
+                            }
+
+                            // footer={<Button onClick={handleDelete}>DELETE</Button>}
+
                             onClick={() => setShowDangerModal(false)}
                         />
 
@@ -131,8 +157,15 @@ const EditNews = () => {
                 <FormContainer
                     style={{
                         padding: '10px',
+                        paddingTop: '20px',
+
                     }}>
-                    <form onSubmit={handleSubmit}>
+                    <form
+                        style={{
+                            padding: '10px',
+                            width: '80%',
+                        }}
+                        onSubmit={handleSubmit}>
                         <label>Title:</label>
                         <input
                             type="text"
@@ -141,20 +174,31 @@ const EditNews = () => {
                             onChange={handleInputChange}
                         />
                         <br />
+                        <br />
+
                         <label>Content:</label>
                         <textarea
                             name="content"
                             value={formData.content}
                             onChange={handleInputChange}
+                            style={{
+                                height: '100px',
+                                width: '100%',
+                            }}
                         />
                         <br />
-                        <label>Image Path:</label>
-                        <input
-                            type="text"
-                            name="image_path"
-                            value={formData.image_path}
-                            onChange={handleInputChange}
-                        />
+                        <div>
+                            {formData.image_path && (
+                                <img
+                                    src={`https://adejord.co.uk${toWebPath(formData.image_path)}`}
+                                    alt="news"
+                                    style={{
+                                        width: '100%',
+                                        height: 'auto',
+                                    }}
+                                />
+                            )}
+                        </div>
                         <br />
                         <label>Date:</label>
                         <input

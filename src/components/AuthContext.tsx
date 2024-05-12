@@ -1,42 +1,43 @@
-// AuthContext.tsx
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios'; // Import axios
 
-// Define the shape of your context state
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (username: string, password: string) => boolean;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
-// Create the context with a default value
 const AuthContext = createContext<AuthContextType>(null!);
-
-// Hook to use the AuthContext
 export const useAuth = () => useContext(AuthContext);
-
-// Dummy credentials (You should replace these with your actual logic)
-const DUMMY_USER = {
-  username: 'admin',
-  password: 'password123' // Note: Never store plain passwords like this in a real app
-};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const login = (username: string, password: string): boolean => {
-    if (username === DUMMY_USER.username && password === DUMMY_USER.password) {
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsAuthenticated(!!token);
+  }, []);
+
+  const login = async (username: string, password: string) => {
+    try {
+      const response = await axios.post('https://adejord.co.uk/login', {
+        username,
+        password
+      });
+      localStorage.setItem('token', response.data.token); // Assuming the token is returned in the response
       setIsAuthenticated(true);
-      return true;
+    } catch (error) {
+      console.error("Login failed:", error);
+      setIsAuthenticated(false);
+      throw error; // Rethrow the error if you want to handle it in the login form component
     }
-    setIsAuthenticated(false);
-    return false;
   };
 
   const logout = () => {
+    localStorage.removeItem('token');
     setIsAuthenticated(false);
   };
 
-  // Pass the isAuthenticated state and login/logout functions down to components
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
       {children}

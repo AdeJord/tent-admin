@@ -16,6 +16,7 @@ const AddNewsForm = () => {
         formData.append('date', new Date().toISOString());
 
         if (values.image && values.image.length > 0) {
+            formData.append('fileType', 'newsImage');  // Specify the file type as news image
             formData.append('image', values.image[0].originFileObj);
         } else {
             // Confirm if they want to proceed without an image

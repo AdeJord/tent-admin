@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, message } from 'antd';
 import axios from 'axios';
 
+
 type FileUploaderProps = {
   fileType: 'galleryImages' | 'TCs' | 'boatBrochure' | 'groupLeaderPolicy' | 'riskAssessments' | 'HagPoster' | 'bookingConditions' | 'insuranceCertificate';
 };
@@ -13,6 +14,8 @@ const uploadFile = async (file: Blob, fileType: FileUploaderProps['fileType']) =
     const formData = new FormData();
     formData.append('fileType', fileType); // Append fileType to the FormData object (NEEDS TO BE 1sT)
     formData.append('file', file);
+    formData.append('newsImage', file);
+    
 
     const uploadUrl = `${BASE_URL}/uploadFile`;
 

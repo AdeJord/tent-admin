@@ -20,13 +20,19 @@ interface NewsItem {
 }
 
 const AllNews = () => {
+
+    // Function to convert file system path to web URL path
+function toWebPath(internalPath: string) {
+  if (!internalPath) return '';
+  return internalPath.replace('/var/www', '');
+}
+
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]); // Initialize newsItems as an empty array
 
   useEffect(() => {
-    console.log("Fetching all news items");
     axios.get("https://adejord.co.uk/news") // Adjust URL as necessary
       .then((response) => {
-        console.log("API Response:", response.data); // Log the API response data
+        // console.log("API Response:", response.data); // Log the API response data
         setNewsItems(response.data); // Set the newsItems state to the fetched data
       })
       .catch((error) => {
@@ -56,7 +62,7 @@ const AllNews = () => {
                   <td>{item.content.substring(0, 100)}...</td> {/* Preview the first 100 characters */}
                   <td>
                     {item.image_path ? (
-                        <img src={`https://adejord.co.uk${item.image_path}`} alt="news" style={{ width: "100px", height: "auto" }} />
+                        <img src={`https://adejord.co.uk${toWebPath(item.image_path)}`} alt="news" style={{ width: "100px", height: "auto" }} />
                     ) : "No Image"}
                   </td>
                   <td>

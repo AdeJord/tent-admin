@@ -1,9 +1,7 @@
 import { Root, Container, ContainerPartition, UploadDiv } from '../styles';
-import AllBookings from './AllBookings'
-import React from 'react';
 import { Link } from 'react-router-dom';
 import FileUploader from '../components/FileUploader';
-import { Upload } from 'antd';
+
 
 function Home() {
     return (
@@ -16,7 +14,6 @@ function Home() {
                 <ContainerPartition>
                     <Link style={{ textDecoration: 'none' }} to="./AllBookings">View/Edit Bookings</Link>
                 </ContainerPartition>
-
             </Container>
             <Container>
                 Volunteers
@@ -80,6 +77,10 @@ function Home() {
                     <FileUploader fileType='insuranceCertificate' />
                 </UploadDiv>
             </Container>
+            {/* <h2>Update Booking Prices</h2>
+            <p>Coven </p><input type='number' />
+            <p>Autherley = ?</p><input type='number' />
+            <p>HAG = ?</p><input type='number' /> */}
         </Root>
     );
 }
