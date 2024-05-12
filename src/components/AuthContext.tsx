@@ -25,6 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password
       });
       localStorage.setItem('token', response.data.token); // Assuming the token is returned in the response
+      localStorage.setItem('userName', username);
       setIsAuthenticated(true);
     } catch (error) {
       console.error("Login failed:", error);

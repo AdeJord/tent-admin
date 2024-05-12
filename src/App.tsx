@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Link, Navigate, Routes } from 'react-router-dom';
 import { useAuth } from './components/AuthContext'; // Ensure you import useAuth
 import SignInPage from './pages/SignIn'; // Ensure you have a SignInPage component
 // Import all other components and pages as before
 
-import { Root, Header } from './styles';
+import { Root, Header, HeaderSideDiv, HeaderDiv } from './styles';
 import AllBookings from './pages/AllBookings';
 import AllVolunteers from './pages/AllVolunteers';
 import Home from './pages/Home';
@@ -17,20 +17,65 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AddNews from './pages/AddNews';
 import AllNews from './pages/AllNews';
 import EditNews from './pages/EditNews';
-
-
+import styled from 'styled-components';
 
 
 function App() {
-  const { isAuthenticated } = useAuth(); // Use the authentication state
+  const { isAuthenticated, logout } = useAuth(); // Use logout from auth context
+  const userName = localStorage.getItem('userName');
+  const [loggedInName, setLoggedInName] = useState(userName);
+  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setLoggedInName(localStorage.getItem('userName'));
+    } else {
+      setLoggedInName('');
+    }
+  }, [isAuthenticated]);
+  
+  const logOut = () => {
+    logout(); // Call logout from the auth context which should handle state changes
+    localStorage.clear(); // Clear local storage
+  };
 
   return (
     <BrowserRouter>
       <Root>
         <Header>
-          <Link to="/" style={{ textDecoration: 'none', fontSize: '4vw', color: '#EAF3E7' }}>
-            Tent Admin Page
-          </Link>
+        <HeaderDiv>
+            <Link to="/" style={{
+              textDecoration: 'none',
+              width: '60%',
+              fontSize: '4vw',
+              color: '#EAF3E7',
+              textAlign: 'right',
+              alignContent: 'right',
+            }}>
+              TENT ADMIN
+            </Link>
+            {isAuthenticated && loggedInName && (
+              <HeaderSideDiv>
+                <p style={{
+                  color: '#EAF3E7',
+                  fontSize: '1em'
+                }}>
+                  logged in as {loggedInName}
+                </p>
+                <Link
+                  onClick={logOut}
+                  to="/signin"
+                  style={{
+                    textDecoration: 'none',
+                    fontSize: '2vw',
+                    color: '#EAF3E7'
+                  }}
+                >
+                  Sign Out
+                </Link>
+              </HeaderSideDiv>
+            )}
+          </HeaderDiv>
         </Header>
         <Routes>
           {/* Conditionally render SignInPage or protected routes */}

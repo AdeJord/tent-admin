@@ -83,16 +83,32 @@ export const ButtonContainer = styled.div`
 
 export const Header = styled.div`
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  background-color: #051101;
+  flex-direction: row; 
+  align-items: center;  
+  justify-content: space-between; 
+  width: 100%; 
   height: 10vh;
-  width: 100vw;
+  background-color: #051101;
   color: #eaf3e7;
-  font-size: 1.3rem;
-  font-family: "Roboto, Arial, Helvetica, sans-serif";
+  font-family: "Roboto, Arial, sans-serif";
 `;
+
+
+export const HeaderDiv = styled.div`
+  display: flex;
+  flex: 2 0 55%;  // Takes up 50% of the space, no shrinking
+  align-items: center;
+`;
+
+export const HeaderSideDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex: 1 0 25%;  // Takes up 25% of the space, no shrinking
+  align-items: center;
+  justify-content: space-around; 
+`;
+
+
 
 export const Container = styled.div`
   height: 20vh;
