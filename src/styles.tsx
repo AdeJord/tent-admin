@@ -2,7 +2,7 @@ import styled from "./styled";
 
 export const Root = styled.div`
   background-color: #eaf3e7;
-  height: 100vh;
+  height: auto;
   width: 100vw;
   display: flex;
   flex-direction: column;
@@ -12,7 +12,16 @@ export const Root = styled.div`
   font-family: "Roboto, Arial, Helvetica, sans-serif";
   padding: 0;
   margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 13px;
+  }
 `;
+
 
 export const FormRoot = styled.div`
   background-color: #eaf3e7;
@@ -27,18 +36,20 @@ export const FormRoot = styled.div`
 `;
 
 export const FormContainer = styled.div`
-  background-color: #e2f0dd;
-  border: 1px solid #051101;
-  border-radius: 5px;
-  box-shadow: 0 0 20px 2px #2f2f2f;
-  height: ;
-  width: 40vw;
+background-color: #eaf3e7;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 90%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: calc(10px + 1vmin);
-  color: #051101;
-  font-family: "Roboto, Arial, Helvetica, sans-serif";
+  padding: 2rem;
+  box-sizing: border-box;
+  font-family: 'Roboto, Arial, Helvetica, sans-serif';
+  color: #333;
+  font-size: 1rem;
 `;
 
 
@@ -91,13 +102,23 @@ export const Header = styled.div`
   background-color: #051101;
   color: #eaf3e7;
   font-family: "Roboto, Arial, sans-serif";
+
+  @media (max-width: 768px) {
+    height: 8vh;
+    flex-direction: column;  // Stack items vertically on smaller screens
+  }
 `;
 
 
 export const HeaderDiv = styled.div`
   display: flex;
-  flex: 2 0 55%;  // Takes up 50% of the space, no shrinking
+  flex: 2 0 55%;  // Takes up 55% of the space, no shrinking
   align-items: center;
+
+  @media (max-width: 768px) {
+    flex: 1 0 100%;  // Full width on smaller screens
+    justify-content: center;
+  }
 `;
 
 export const HeaderSideDiv = styled.div`
@@ -106,9 +127,13 @@ export const HeaderSideDiv = styled.div`
   flex: 1 0 25%;  // Takes up 25% of the space, no shrinking
   align-items: center;
   justify-content: space-around; 
+
+  @media (max-width: 768px) {
+    flex: 1 0 100%;  // Full width on smaller screens
+    justify-content: center;
+    margin-top: 10px;
+  }
 `;
-
-
 
 export const Container = styled.div`
   height: 20vh;
@@ -118,6 +143,17 @@ export const Container = styled.div`
   align-items: center;
   justify-content: space-evenly;
   font-family: "Roboto, Arial, Helvetica, sans-serif";
+  padding: 0.5rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    height: auto;
+    width: 80vw;
+  }
+
+  @media (max-width: 480px) {
+    width: 90vw;
+  }
 `;
 
 export const ContainerRow = styled.div`
@@ -140,7 +176,7 @@ export const ColumnContainer = styled.div`
 `;
 
 export const ContainerPartition = styled.div`
-  borderRadius: 10px;
+  border-radius: 10px;
   height: 10vh;
   width: 40vw;
   display: flex;
@@ -156,6 +192,22 @@ export const ContainerPartition = styled.div`
   &:hover {
     background-color: #eaf3e7;
     color: green;
+  }
+
+  @media (max-width: 768px) {
+    width: 80vw;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    height: auto;
+    padding: 0.5rem;
+  }
+
+  @media (max-width: 480px) {
+    width: 90vw;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    height: auto;
+    padding: 0.5rem;
   }
 `;
 
@@ -175,9 +227,20 @@ export const UploadDiv = styled.div`
   margin: 0.5rem;
   width: 10vw;
   height: 10vh;
+
   &:hover {
     background-color: #eaf3e7;
     color: #051101;
+  }
+
+  @media (max-width: 768px) {
+    width: 30vw;
+    height: 5vh;
+  }
+
+  @media (max-width: 480px) {
+    width: 40vw;
+    height: 10vh;
   }
 `;
 
@@ -444,3 +507,74 @@ button {
 //   }
 // }
 `;
+
+export const Input = styled.input`
+  width: 80%;
+  min-width: 200px;
+  padding: 8px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+
+  &[type="number"], &[type="radio"] {
+    width: 30%; 
+  }
+  `;
+
+  export const Label = styled.label`
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+  text-align: left
+`;
+
+export const ErrorMessage = styled.p`
+  color: red;
+  font-size: 0.8rem;
+  margin: 5px 0;
+`;
+
+export const FormButton = styled.button`
+width: 100%;
+padding: 12px 20px;
+background-color: #4CAF50;
+color: white;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+font-size: 1.2rem;
+margin-top: 20px;
+text-align: center;
+`;
+
+export const RadioGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px; 
+`;
+
+export const GroupLabel = styled.p`
+  font-weight: bold;
+  margin-bottom: 5px; 
+`;
+
+export const RadioLabel = styled.label`
+  display: flex;
+  align-items: center;
+  margin-right: 20px; 
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #333;
+
+  input[type="radio"] {
+    margin-right: 8px; 
+  }
+`;
+
+export const NarrowInput = styled(Input)`
+  width: 40%;
+  margin-top: 8px; 
+  margin-bottom: 8px;
+`;
+

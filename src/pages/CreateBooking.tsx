@@ -2,7 +2,16 @@ import React from "react";
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   FormRoot,
-  FormContainer
+  FormContainer,
+  Input,
+  Label,
+  RadioGroup,
+  ErrorMessage,
+  Link,
+  RadioLabel,
+  GroupLabel,
+  NarrowInput,
+  FormButton,
 } from "../styles";
 import axios from "axios";
 import { useForm, SubmitHandler, Resolver } from "react-hook-form";
@@ -31,6 +40,9 @@ interface FormData {
   group_leader_policy: boolean;
   total_passengers: number;
   group_name?: string | undefined;
+  skipper?: string | undefined;
+  crew1?: string | undefined;
+  crew2?: string | undefined;
   // Need to add group size
 }
 
@@ -87,27 +99,35 @@ const schema = yup.object().shape({
       name: 'is-booking-date-available',
       message: 'There is already a booking on this date, please choose another',
       test: async function (value) {
-        // Only perform the validation if the date is in the future
         if (value) {
           return await isBookingDateAvailable(value);
         }
-        return false; // Skip validation if date is not provided
+        return false;
       },
     }),
-  wheelchair_users: yup
-    .number()
-    .required()
-    .oneOf([0, 1, 2], "Maximum of 2 wheelchair users per booking"),
   total_passengers: yup
     .number()
-    .required()
+    .transform((value, originalValue) => {
+      return (originalValue === '' || originalValue === null || originalValue === undefined) ? null : value;
+    })
+    .required('Total passengers is required')
     .oneOf([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Maximum of 12 passengers per booking"),
+  wheelchair_users: yup
+    .number()
+    .transform((value, originalValue) => {
+      return (originalValue === '' || originalValue === null || originalValue === undefined) ? null : value;
+    })
+    .required('Wheelchair user count is required')
+    .oneOf([0, 1, 2], "Maximum of 2 wheelchair users per booking"),
   smoking: yup.boolean().required("Please select Yes or No for smoking"),
   destination: yup.string().required("Please select a destination"),
   lunch_arrangements: yup.string().required("Please select a lunch option"),
   notes: yup.string().notRequired(),
   terms_and_conditions: yup.boolean().oneOf([true], 'Please accept the terms and conditions'),
   group_leader_policy: yup.boolean().oneOf([true], 'Please accept the group leader policy'),
+  skipper: yup.string().notRequired(),
+  crew1: yup.string().notRequired(),
+  crew2: yup.string().notRequired(),
 });
 
 
@@ -254,6 +274,7 @@ const CreateBooking: React.FC = () => {
     resolver: yupResolver(schema) as MyResolverType,
     defaultValues: {
       wheelchair_users: 0,
+      total_passengers: 1,
       booking_date: selectedDate || '', // Set the default value for booking_date
     },
   });
@@ -266,7 +287,7 @@ const CreateBooking: React.FC = () => {
   }, [selectedDate, setValue]);
 
   return (
-    <FormRoot>
+    <>
       {showModal && (
         <>
           <Backdrop onClick={ModalClickHandler}>
@@ -279,261 +300,227 @@ const CreateBooking: React.FC = () => {
           </Backdrop>
         </>
       )}
-      <h1>Booking Form</h1>
+      <h1>Internal Booking Form</h1>
       <FormContainer>
-        <form
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            paddingTop: "2vh",
-            height: "auto",
-            width: "30vw",
-          }}
-          onSubmit={handleSubmit((data: FormData) => {
-            submitBooking(data);
-            // console.log(data); 
-          })}
-        >
-        <label
-        style={{
-          textAlign: "center",
-        }}
-        >Booking Date</label>
-        <div style={{
-           margin: "10px 0", 
-           backgroundColor: "#e2f0dd", 
-           borderRadius: "4px", 
-           fontSize: "1.2rem",
-           textAlign: "center",
-           }}>
-          {selectedDate ? new Date(selectedDate).toLocaleDateString('en-GB') : 'No date selected'}
-          <input
-            type="hidden"
-            {...register("booking_date")}
-            value={selectedDate || ''}
-          />
-        </div>
-        {errors.booking_date && (
-          <p style={{ color: "red" }}>{errors.booking_date.message}</p>
-        )}
-          <br />
-          <label>First Name</label>
-          <input
-            style={{ width: "20vw" }}
-            {...register("first_name")}
-            autoComplete="given-name" />
-          {errors.first_name && (
-            <p style={{ color: "red" }}>{errors.first_name.message}</p>
-          )}
-
-          <label>Surname</label>
-          <input
-            style={{ width: "20vw" }}
-            {...register("surname")}
-            autoComplete="family-name" />
-          {errors.surname && (
-            <p style={{ color: "red" }}>{errors.surname.message}</p>
-          )}
-          <label>Group/Organisation name <small>(If applicable)</small></label>
-          <input
-            style={{ width: "20vw" }}
-            {...register("group_name")}
-          />
-          <label>Contact Number</label>
-          <input
-            style={{ width: "20vw" }}
-            type="string" {...register("contact_number")}
-            autoComplete="tel" />
-          {errors.contact_number && (
-            <p style={{ color: "red" }}>{errors.contact_number.message}</p>
-          )}
-
-          <label>Email</label>
-          <input
-            style={{ width: "20vw" }}
-            type="text" {...register("email_address")}
-            autoComplete="email" />
-          {errors.email_address && (
-            <p style={{ color: "red" }}>{errors.email_address.message}</p>
-          )}
-          <small>Your booking confirmation will be sent to this email address.</small>
-
-          <label>House Number</label>
-          <input
-            style={{ width: "20vw" }}
-            type="string" {...register("house_number")}
-            autoComplete="address-line1" />
-          {errors.house_number && (
-            <p style={{ color: "red" }}>{errors.house_number.message}</p>
-          )}
-
-          <label>Street Name</label>
-          <input
-            style={{ width: "20vw" }}
-            type="string" {...register("street_name")}
-            autoComplete="address-line2" />
-          {errors.street_name && (
-            <p style={{ color: "red" }}>{errors.street_name.message}</p>
-          )}
-
-          <label>City</label>
-          <input
-            style={{ width: "20vw" }}
-            type="string" {...register("city")}
-            autoComplete="address-level2" />
-          {errors.city && (
-            <p style={{ color: "red" }}>{errors.city.message}</p>
-          )}
-
-          <label>Postcode</label>
-          <input
-            style={{ width: "10vw" }}
-            type="string" {...register("postcode")}
-            autoComplete="postal-code" />
-          {errors.postcode && (
-            <p style={{ color: "red" }}>{errors.postcode.message}</p>
-          )}
-          <br />
-          <label>Total Passengers <small>(Max 12)</small></label>
-          <input
+        <form onSubmit={handleSubmit(submitBooking)}>
+          <div
             style={{
-              width: "5vw",
-            }} type="number" min={1} max={12} {...register("total_passengers")} />
-          {errors.total_passengers && (
-            <p style={{ color: "red" }}>{errors.total_passengers.message}</p>
-          )}
-          <br />
-          <label>Wheelchair Users <small>(Max 2)</small></label>
-          <input
-            style={{
-              width: "5vw",
-            }} type="number" min={0} max={2} {...register("wheelchair_users")} />
-          {errors.wheelchair_users && (
-            <p style={{ color: "red" }}>{errors.wheelchair_users.message}</p>
-          )}
-          <br />
-          <div>
-            <label>Smoking</label>
-            <label>
-              <input type="radio"
-                value="true"
-                {...register("smoking")} />
-              Yes
-            </label>
-            <label>
-              <input type="radio"
-                value="false"
-                {...register("smoking")} />
-              No
-              {errors.smoking && (
-                <p style={{ color: "red" }}>{errors.smoking.message}</p>
-              )}
-            </label>
+              width: "100%",
+              textAlign: "center",
+              display: "flex",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                paddingBottom: "1em",
+              }}
+            >
+              Booking Date {/* Render label as a paragraph */}
+            </div>
           </div>
-          <br />
-          <div>
-            <label>Destination</label>
-            <br />
-            <label>
+          <div style={{ textAlign: "center" }}>
+            {selectedDate
+              ? new Date(selectedDate).toLocaleDateString("en-GB")
+              : "No date selected"}
+          </div>
+          <Input type="hidden" {...register("booking_date")} />
+          <Label>First Name</Label>
+          <Input {...register("first_name")} autoComplete="given-name" />
+          {errors.first_name && (
+            <ErrorMessage>{errors.first_name.message}</ErrorMessage>
+          )}
+
+          <Label>Surname</Label>
+          <Input {...register("surname")} autoComplete="family-name" />
+          {errors.surname && (
+            <ErrorMessage>{errors.surname.message}</ErrorMessage>
+          )}
+
+          <Label>Group/Organisation Name (If applicable)</Label>
+          <Input {...register("group_name")} />
+
+          <Label>Contact Number</Label>
+          <Input
+            type="tel"
+            {...register("contact_number")}
+            autoComplete="tel"
+          />
+          {errors.contact_number && (
+            <ErrorMessage>{errors.contact_number.message}</ErrorMessage>
+          )}
+
+          <Label>Email</Label>
+          <Input
+            type="email"
+            {...register("email_address")}
+            autoComplete="email"
+          />
+          {errors.email_address && (
+            <ErrorMessage>{errors.email_address.message}</ErrorMessage>
+          )}
+
+          <Label>House Number</Label>
+          <Input {...register("house_number")} autoComplete="address-line1" />
+          {errors.house_number && (
+            <ErrorMessage>{errors.house_number.message}</ErrorMessage>
+          )}
+
+          <Label>Street Name</Label>
+          <Input {...register("street_name")} autoComplete="address-line2" />
+          {errors.street_name && (
+            <ErrorMessage>{errors.street_name.message}</ErrorMessage>
+          )}
+
+          <Label>City</Label>
+          <Input {...register("city")} autoComplete="address-level2" />
+          {errors.city && <ErrorMessage>{errors.city.message}</ErrorMessage>}
+
+          <Label>Postcode</Label>
+          <NarrowInput {...register("postcode")} autoComplete="postal-code" />
+          {errors.postcode && (
+            <ErrorMessage>{errors.postcode.message}</ErrorMessage>
+          )}
+
+          <Label>Total Passengers (Max 12)</Label>
+          <Input type="number" {...register("total_passengers")} />
+          {errors.total_passengers && <p>{errors.total_passengers.message}</p>}
+
+          <Label>Wheelchair Users (Max 2)</Label>
+          <Input type="number" {...register("wheelchair_users")} />
+          {errors.wheelchair_users && <p>{errors.wheelchair_users.message}</p>}
+
+
+          <RadioGroup>
+            <GroupLabel>Smoking</GroupLabel>
+            <div>
+              <input type="radio" value="true" {...register("smoking")} /> Yes
+              <br />
+              <input type="radio" value="false" {...register("smoking")} /> No
+            </div>
+            {errors.smoking && (
+              <ErrorMessage>{errors.smoking.message}</ErrorMessage>
+            )}
+          </RadioGroup>
+
+          <RadioGroup>
+            <GroupLabel>Destination</GroupLabel>
+            <RadioLabel>
               <input
                 type="radio"
                 value="Autherley"
                 {...register("destination")}
-                onChange={() => setSelectedDestination("Autherley")}
-              />
+              />{" "}
               Autherley (£130)
-            </label>
-            <br />
-            <label>
-              <input
-                type="radio"
-                value="Coven"
-                {...register("destination")}
-                onChange={() => setSelectedDestination("Coven")}
-              />
+            </RadioLabel>
+            <RadioLabel>
+              <input type="radio" value="Coven" {...register("destination")} />{" "}
               Coven(£100)
-              {errors.destination && (
-                <p style={{ color: "red" }}>{errors.destination.message}</p>
-              )}
-              <br />
-            </label>
-            <label>
+            </RadioLabel>
+            <RadioLabel>
               <input
                 type="radio"
                 value="Penkridge"
                 {...register("destination")}
-                onChange={() => setSelectedDestination("Penkridge")}
-              />
+              />{" "}
               Penkridge "Have A Go day"(£220)
-              {errors.destination && (
-                <p style={{ color: "red" }}>{errors.destination.message}</p>
-              )}
-            </label>
-          </div>
+            </RadioLabel>
+          </RadioGroup>
+
+          <RadioGroup>
+            <GroupLabel>Lunch Arrangements</GroupLabel>
+            <RadioLabel>
+              <input
+                type="radio"
+                value="Packed Lunch"
+                {...register("lunch_arrangements")}
+              />{" "}
+              Packed Lunch
+            </RadioLabel>
+            <RadioLabel>
+              <input
+                type="radio"
+                value="Fish and Chips"
+                {...register("lunch_arrangements")}
+              />{" "}
+              Fish & Chips
+            </RadioLabel>
+            <RadioLabel>
+              <input
+                type="radio"
+                value="Pub Meal"
+                {...register("lunch_arrangements")}
+              />{" "}
+              Pub Meal
+            </RadioLabel>
+          </RadioGroup>
           <br />
-          <label>Lunch Arrangements</label>
-          <label>
-            <input
-              type="radio"
-              value="Packed Lunch"
-              {...register("lunch_arrangements")}
-            />
-            Packed Lunch
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="Fish and Chips"
-              {...register("lunch_arrangements")}
-              disabled={selectedDestination === "Penkridge"}
-            />
-            Fish & Chips
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="Pub Meal"
-              {...register("lunch_arrangements")}
-              disabled={selectedDestination === "Autherley" || selectedDestination === "Penkridge"}
-            />
-            Pub Meal
-            {errors.lunch_arrangements && (
-              <p style={{ color: "red" }}>{errors.lunch_arrangements.message}</p>
-            )}
-          </label>
+          <GroupLabel>Other Requirements</GroupLabel>
           <br />
-          <label>Other Requirements</label>
-          <input
-            style={{ height: "7vh" }}
-            type="string" {...register("notes")} />
+          <Input
+            style={{
+              height: "5em",
+              width: "100%",
+              padding: "12px 20px",
+              margin: "8px 0",
+              display: "inline-block",
+              border: "1px solid #ccc",
+              boxSizing: "border-box",
+              borderRadius: "4px",
+              fontSize: ".8rem",
+            }}
+            type="string"
+            {...register("notes")}
+          />
           <br />
           <label>
-            I have read and agree to the terms and conditions
-            <input
-              type="checkbox"
-              {...register("terms_and_conditions")}
-            />
+            <input type="checkbox" {...register("terms_and_conditions")} />
+            <Link href="/TermsAndCond">
+              I have read and agree to the terms and conditions{" "}
+            </Link>
             {errors.terms_and_conditions && (
-              <p style={{ color: "red" }}>{errors.terms_and_conditions.message}</p>
+              <p style={{ color: "red" }}>
+                {errors.terms_and_conditions.message}
+              </p>
             )}
           </label>
-
-          <label>
-            I have read and agree to the group leader policy
-            <input
-              type="checkbox"
-              {...register("group_leader_policy")}
-            />
-            {errors.group_leader_policy && (
-              <p style={{ color: "red" }}>{errors.group_leader_policy.message}</p>
-            )}
-          </label>
-
-          <input type="submit" />
           <br />
+          <label>
+            <input type="checkbox" {...register("group_leader_policy")} />
+            <Link href="/GroupLeaderPolicy">
+              I have read and agree to the group leader policy{" "}
+            </Link>
+            {errors.group_leader_policy && (
+              <p style={{ color: "red" }}>
+                {errors.group_leader_policy.message}
+              </p>
+            )}
+          </label>
+          <br />
+          <hr />
+          <GroupLabel>
+            Assign Crew
+          </GroupLabel>
+          <GroupLabel>
+            Skipper
+            <Input type="text" {...register("skipper")} />
+          </GroupLabel>
+          <GroupLabel>
+            1st Crew
+            <Input type="text" {...register("crew1")} />
+          </GroupLabel>
+          <GroupLabel>
+            2nd Crew
+            <Input type="text" {...register("crew2")} />
+          </GroupLabel>
+          <br />
+          <FormButton type="submit">Submit</FormButton>
         </form>
       </FormContainer>
-    </FormRoot>
+    </>
   );
 };
 

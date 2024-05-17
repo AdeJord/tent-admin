@@ -17,7 +17,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AddNews from './pages/AddNews';
 import AllNews from './pages/AllNews';
 import EditNews from './pages/EditNews';
-import styled from 'styled-components';
 
 
 function App() {
@@ -58,7 +57,7 @@ function App() {
               <HeaderSideDiv>
                 <p style={{
                   color: '#EAF3E7',
-                  fontSize: '1em'
+                  fontSize: '15px'
                 }}>
                   logged in as {loggedInName}
                 </p>
@@ -67,7 +66,7 @@ function App() {
                   to="/signin"
                   style={{
                     textDecoration: 'none',
-                    fontSize: '2vw',
+                    fontSize: '10px',
                     color: '#EAF3E7'
                   }}
                 >
