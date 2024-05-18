@@ -64,8 +64,8 @@ const isBookingDateAvailable = async (date: string) => {
     //Get booked dates from the API
     const response = await axios.get(`https://adejord.co.uk/dates?date=${date}`);
     const bookedDates = response.data;
-    console.log('Selected Date:', selectedDate);
-    console.log('Booked Dates:', bookedDates);
+    // console.log('Selected Date:', selectedDate);
+    // console.log('Booked Dates:', bookedDates);
     const isDateBooked = bookedDates.some((bookedDate: string) => new Date(bookedDate).getTime() === selectedDate.getTime());
     // console.log('Is Date Booked:', isDateBooked);
 
@@ -180,7 +180,7 @@ const CreateBooking: React.FC = () => {
       .filter(volunteer => {
         if (volunteer.role) {
           const role = volunteer.role.trim().toLowerCase();
-          console.log("Checking volunteer role (trimmed and lowercased):", role); // Log each volunteer's role
+          // console.log("Checking volunteer role (trimmed and lowercased):", role); // Log each volunteer's role
           return role === 'skipper';
         } else {
           console.log("Volunteer with no role or null role:", volunteer);
@@ -188,7 +188,7 @@ const CreateBooking: React.FC = () => {
         }
       })
       .map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
-    console.log("Filtered Skippers:", filteredSkippers); // Log the filtered result
+    // console.log("Filtered Skippers:", filteredSkippers); // Log the filtered result
     setSkippers(filteredSkippers);
 
     const filteredCrew1 = volunteers
@@ -228,17 +228,6 @@ const CreateBooking: React.FC = () => {
     setAdminOther(filteredAdminOther);
   }, [volunteers]);
 
-  const onSubmit: SubmitHandler<FormData> = async data => {
-    console.log(data); // Logs the form data
-    try {
-      const response = await axios.post("https://adejord.co.uk/addVolunteers", data);
-      console.log("Response from API:", response.data);
-      // Handle successful response
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      // Handle submission error
-    }
-  };
 
   // Helper function to handle modal click
   const ModalClickHandler = () => {

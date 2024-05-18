@@ -4,9 +4,52 @@ import axios from 'axios';
 import Modal from '../components/modal/Modal';
 import DangerModal from '../components/modal/DangerModal';
 import Backdrop from '../components/modal/ModalBackdrop';
-import { Root, FormRoot, FormContainer, Button, ButtonContainer } from '../styles';
+import {
+    Root,
+    FormRoot,
+    FormContainer,
+    Button,
+    GroupLabel,
+} from '../styles';
 import { set } from 'date-fns';
 import Select from 'react-select';
+import { Resolver, useForm } from 'react-hook-form';
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from 'yup';
+
+interface FormData {
+    first_name: string;
+    surname: string;
+    group_name?: string;
+    contact_number: string;
+    email_address: string;
+    house_number: string;
+    street_name: string;
+    city: string;
+    postcode: string;
+    booking_date: string;
+    total_passengers: number;
+    wheelchair_users: number;
+    smoking: boolean;
+    destination: string;
+    lunch_arrangements: string;
+    notes?: string;
+    terms_and_conditions: boolean;
+    group_leader_policy: boolean;
+    skipper?: string;
+    crew1?: string;
+    crew2?: string;
+};
+
+interface Volunteer {
+    surname: string;
+    first_name: string;
+    name: string;
+    role: string;
+};
+
+
+
 
 const BASE_URL = 'https://adejord.co.uk'; // Replace with your API base URL
 
@@ -35,6 +78,29 @@ const fetchBookingData = async (bookingId: any) => {
 };
 
 
+const isBookingDateAvailable = async (date: string) => {
+    try {
+        const currentDate = new Date();
+        const selectedDate = new Date(date);
+
+        if (selectedDate <= currentDate) {
+            return false;
+        }
+
+        //Get booked dates from the API
+        const response = await axios.get(`https://adejord.co.uk/dates?date=${date}`);
+        const bookedDates = response.data;
+        // console.log('Selected Date:', selectedDate);
+        // console.log('Booked Dates:', bookedDates);
+        const isDateBooked = bookedDates.some((bookedDate: string) => new Date(bookedDate).getTime() === selectedDate.getTime());
+        // console.log('Is Date Booked:', isDateBooked);
+
+        return !isDateBooked;
+    } catch (error) {
+        console.error('Error checking booking availability:', error);
+        return false;
+    }
+};
 
 
 
@@ -51,8 +117,6 @@ export const updateBookingData = async (bookingId: number, formData: any) => {
 
 
 
-
-
 // Function to delete booking data by bookingId
 const deleteBookingData = async (bookingId: any) => {
     try {
@@ -63,12 +127,151 @@ const deleteBookingData = async (bookingId: any) => {
     }
 }
 
+// Define the schema for form validation
+const schema = yup.object().shape({
+    first_name: yup.string().required('You must enter a first name'),
+    surname: yup.string().required('You must enter a surname'),
+    group_name: yup.string().notRequired(),
+    contact_number: yup.string().required('You must enter a contact number'),
+    email_address: yup.string().required('You must enter an email address'),
+    house_number: yup.string().required('You must enter a house number'),
+    street_name: yup.string().required('You must enter a street name'),
+    city: yup.string().required('You must enter a city'),
+    postcode: yup.string().required('You must enter a postcode'),
+    booking_date: yup
+        .string()
+        .required('You must select a date')
+        .test({
+            name: 'is-future-date',
+            message: 'We can travel the canals but, unfortunately, not through time. Please select a date that is in the future!',
+            test: function (value) {
+                const currentDate = new Date();
+                const selectedDate = new Date(value);
+
+                return selectedDate > currentDate;
+            },
+        })
+        .test({
+            name: 'is-booking-date-available',
+            message: 'There is already a booking on this date, please choose another',
+            test: async function (value) {
+                if (value) {
+                    return await isBookingDateAvailable(value);
+                }
+                return false;
+            },
+        }),
+    total_passengers: yup
+        .number()
+        .transform((value, originalValue) => {
+            return (originalValue === '' || originalValue === null || originalValue === undefined) ? null : value;
+        })
+        .required('Total passengers is required')
+        .oneOf([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Maximum of 12 passengers per booking"),
+    wheelchair_users: yup
+        .number()
+        .transform((value, originalValue) => {
+            return (originalValue === '' || originalValue === null || originalValue === undefined) ? null : value;
+        })
+        .required('Wheelchair user count is required')
+        .oneOf([0, 1, 2], "Maximum of 2 wheelchair users per booking"),
+    smoking: yup.boolean().required("Please select Yes or No for smoking"),
+    destination: yup.string().required("Please select a destination"),
+    lunch_arrangements: yup.string().required("Please select a lunch option"),
+    notes: yup.string().notRequired(),
+    terms_and_conditions: yup.boolean().oneOf([true], 'Please accept the terms and conditions'),
+    group_leader_policy: yup.boolean().oneOf([true], 'Please accept the group leader policy'),
+    skipper: yup.string().notRequired(),
+    crew1: yup.string().notRequired(),
+    crew2: yup.string().notRequired(),
+    adminOther: yup.string().notRequired(),
+});
+
+
+
+type MyResolverType = Resolver<FormData, typeof yupResolver>;
+
 const BookingEditPage = () => {
     const { bookingId } = useParams();
     const navigate = useNavigate();
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showDangerModal, setShowDangerModal] = useState(false);
     const [showSuccessDeleteModal, setShowSuccessDeleteModal] = useState(false);
+    const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
+    const [skippers, setSkippers] = useState<string[]>([]);
+    const [crew1, setCrew1] = useState<string[]>([]);
+    const [crew2, setCrew2] = useState<string[]>([]);
+    const [adminOther, setAdminOther] = useState<string[]>([]);
+
+    // fetch list of volunteers from adejord.co.uk/volunteers
+    useEffect(() => {
+        const fetchVolunteers = async () => {
+            try {
+                const response = await axios.get("https://adejord.co.uk/volunteers");
+                console.log("API Response:", response.data); // Log to confirm the response data
+                setVolunteers(response.data);
+            } catch (error) {
+                console.error("Error fetching volunteers:", error);
+            }
+        };
+        fetchVolunteers();
+    }, []);
+
+    // filter skippers, crew1 and crew2 from volunteers for asigning crew dropdowns
+    useEffect(() => {
+        console.log("Volunteers for filtering:", volunteers); // Log to check volunteers before filtering
+
+        const filteredSkippers = volunteers
+            .filter(volunteer => {
+                if (volunteer.role) {
+                    const role = volunteer.role.trim().toLowerCase();
+                    // console.log("Checking volunteer role (trimmed and lowercased):", role); // Log each volunteer's role
+                    return role === 'skipper';
+                } else {
+                    console.log("Volunteer with no role or null role:", volunteer);
+                    return false;
+                }
+            })
+            .map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
+        // console.log("Filtered Skippers:", filteredSkippers); // Log the filtered result
+        setSkippers(filteredSkippers);
+
+        const filteredCrew1 = volunteers
+            .filter(volunteer => {
+                if (volunteer.role) {
+                    const role = volunteer.role.trim().toLowerCase();
+                    return role === 'crew1';
+                } else {
+                    return false;
+                }
+            })
+            .map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
+        setCrew1(filteredCrew1);
+
+        const filteredCrew2 = volunteers
+            .filter(volunteer => {
+                if (volunteer.role) {
+                    const role = volunteer.role.trim().toLowerCase();
+                    return role === 'crew2';
+                } else {
+                    return false;
+                }
+            })
+            .map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
+        setCrew2(filteredCrew2);
+
+        const filteredAdminOther = volunteers
+            .filter(volunteer => {
+                if (volunteer.role) {
+                    const role = volunteer.role.trim().toLowerCase();
+                    return role === 'admin/other';
+                } else {
+                    return false;
+                }
+            })
+            .map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
+        setAdminOther(filteredAdminOther);
+    }, [volunteers]);
 
     const [formData, setFormData] = useState({
         first_name: "",
@@ -196,6 +399,14 @@ const BookingEditPage = () => {
         navigate(`/`); // Navigate to the desired page
     }
 
+    const {
+        register,
+        formState: { errors },
+        setValue,  // Import setValue from useForm
+    } = useForm<FormData>({
+        resolver: yupResolver(schema) as unknown as MyResolverType,
+    });
+
     return (
         <Root>
             <FormRoot>
@@ -242,7 +453,7 @@ const BookingEditPage = () => {
                                 >DELETE</Button>
                             </div>} onClose={function (): void {
                                 throw new Error('Function not implemented.');
-                            } }                        />
+                            }} />
                     </Backdrop>
                 )}
 
@@ -404,73 +615,80 @@ const BookingEditPage = () => {
                         />
                         <hr />
                         <br />
-                        <label>Assign Skipper:</label>
-                        <input
-                            type='dropdown'
-                        />
+                        <GroupLabel>
+                            Assign Crew
+                        </GroupLabel>
+                        <GroupLabel>
+                            <label htmlFor="skipper">Skipper</label>
+                            <select id="skipper" {...register("skipper")}>
+                                <option value="">Select a skipper</option>
+                                {skippers.map((skipper, index) => (
+                                    <option key={index} value={skipper}>
+                                        {skipper}
+                                    </option>
+                                ))}
+                            </select>
+                        </GroupLabel>
+                        <GroupLabel>
+                            <label htmlFor="crew1">1st Crew</label>
+                            <select id="crew1" {...register("crew1")}>
+                                <option value="">Select a 1st Crew</option>
+                                {crew1.map((crew1, index) => (
+                                    <option key={index} value={crew1}>
+                                        {crew1}
+                                    </option>
+                                ))}
+                            </select>
+                        </GroupLabel>
+                        <GroupLabel>
+                            <label htmlFor="crew2">2nd Crew</label>
+                            <select id="crew2" {...register("crew2")}>
+                                <option value="">Select a 2nd Crew</option>
+                                {crew2.map((crew2, index) => (
+                                    <option key={index} value={crew2}>
+                                        {crew2}
+                                    </option>
+                                ))}
+                            </select>
+                        </GroupLabel>
+                        <GroupLabel>
+                            <label htmlFor="paid">Paid - </label>
+                        </GroupLabel>
+
+                        <GroupLabel>
+                            <label htmlFor="completed">Completed? - </label>
+                        </GroupLabel>
+
+                        <Button
+                            style={{
+                                backgroundColor: 'green',
+                                color: 'white',
+                                border: 'none'
+                            }}
+                            type="submit">SAVE CHANGES</Button>
                         <br />
-                        <hr />
-                        Assign 1st Crew
-                        <br />
-                        <hr />
                         <div
                             style={{
-                                backgroundColor: '#eaf3e7',
+                                backgroundColor: 'red',
                                 color: 'white',
-                                width: '28vw',
+                                width: '10vw',
                                 height: '5vh',
+                                borderRadius: '5px',
+                                border: '1px solid black',
                                 display: 'flex',
                                 flexDirection: 'row',
                                 alignItems: 'center',
-                                justifyContent: 'space-between',
                                 padding: '0.5rem',
                             }}>
-                            <div
-                                style={{
-                                    backgroundColor: 'green',
-                                    color: 'white',
-                                    width: '10vw',
-                                    height: '5vh',
-                                    borderRadius: '5px',
-                                    border: '1px solid black',
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    padding: '0.5rem',
-                                }}>
-
-                                <Button
-                                    style={{
-                                        backgroundColor: 'green',
-                                        color: 'white',
-                                        border: 'none'
-                                    }}
-                                    type="submit">SAVE CHANGES</Button>
-                            </div>
-                            <br />
-                            <div
+                            <Button
+                                onClick={() => handleDangerModalOpen()}
                                 style={{
                                     backgroundColor: 'red',
                                     color: 'white',
-                                    width: '10vw',
-                                    height: '5vh',
-                                    borderRadius: '5px',
-                                    border: '1px solid black',
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    padding: '0.5rem',
-                                }}>
-                                <Button
-                                    onClick={() => handleDangerModalOpen()}
-                                    style={{
-                                        backgroundColor: 'red',
-                                        color: 'white',
-                                        border: 'none'
-                                    }}
-                                    type='button'
-                                >DELETE </Button>
-                            </div>
+                                    border: 'none'
+                                }}
+                                type='button'
+                            >DELETE </Button>
                         </div>
                         <br />
                     </form>
