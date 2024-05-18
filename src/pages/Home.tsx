@@ -33,11 +33,15 @@ function Home() {
                     <Link style={{ textDecoration: 'none' }} to="/news">View/Edit News</Link>
                 </ContainerPartition>
             </Container>
-            <h2>Upload documents and images to website</h2>
-            <Container
+            <h2
                 style={{
-                    width: '100%',
-                }}>
+                    textAlign: 'center',
+                    padding: '20px',
+                }}
+            >
+                Upload documents and Gallery images to website
+            </h2>
+            <Container>
                 <UploadDiv>
                     Gallery Images
                     <FileUploader fileType='galleryImages' />
@@ -57,9 +61,7 @@ function Home() {
                     <FileUploader fileType='groupLeaderPolicy' />
                 </UploadDiv>
             </Container>
-            <Container style={{
-                width: '100%',
-            }}>
+            <Container>
                 <UploadDiv>
                     Risk Assesments
                     <FileUploader fileType='riskAssessments' />

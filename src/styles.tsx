@@ -3,6 +3,7 @@ import styled from "./styled";
 export const Root = styled.div`
   background-color: #eaf3e7;
   height: auto;
+  min-height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;
@@ -36,7 +37,7 @@ export const FormRoot = styled.div`
 `;
 
 export const FormContainer = styled.div`
-background-color: #eaf3e7;
+  background-color: #ffffff;
   border: 1px solid #dcdcdc;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -551,7 +552,6 @@ text-align: center;
 export const RadioGroup = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: 15px; 
 `;
 
 export const GroupLabel = styled.p`

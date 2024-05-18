@@ -32,12 +32,11 @@ interface Booking {
   notes: string;
   terms_and_conditions: string;
   group_leader_policy: string;
-
-  // paid_status: string;
-  // skipper: string;
-  // crew1: string;
-  // crew2: string;
-  // complete: string;
+  paid: number;
+  skipper: string;
+  crew1: string;
+  crew2: string;
+  complete: string;
   bookingmonth: string;
 }
 
@@ -78,21 +77,12 @@ const AllBookings = () => {
       .then((response) => {
         // console.log("API Response:", response.data); // Log the response
         setData(response.data);
-        // console.log("Data:", response.data);
+        console.log("Data:", response.data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
         console.error('Error details:', error.response);
       });
-
-    // function to log the type of data of the id
-    // const logType = (id: any) => {
-    //   console.log(typeof id);
-    // };
-    // { logType(data[0].id) }  // Number
-
-
-    // { console.log(getBookingsForMonth(targetMonth)) }
   }, [targetMonth]);
 
 
@@ -253,11 +243,10 @@ const AllBookings = () => {
                 <th>Notes</th>
                 <th>Terms and Conditions</th>
                 <th>Group Leader Policy</th>
-                {/* <th>Paid Status</th>
                 <th>Skipper</th>
                 <th>Crew 1</th>
                 <th>Crew 2</th>
-                <th>Complete</th> */}
+                <th>Complete</th>
                 <th>LINK TO EDIT!</th>
               </tr>
             </thead>
@@ -282,11 +271,10 @@ const AllBookings = () => {
                   <td>{item.notes}</td>
                   <td>{item.terms_and_conditions ? 'Agreed' : 'NOT Agreed'}</td>
                   <td>{item.group_leader_policy ? 'Agreed' : 'NOT Agreed'}</td>
-                  {/* <td>{item.paid_status}</td>
                   <td>{item.skipper}</td>
                   <td>{item.crew1}</td>
                   <td>{item.crew2}</td>
-                  <td>{item.complete}</td> */}
+                  <td>{item.complete}</td>
                   <td
                     style={{
                       color: "blue",

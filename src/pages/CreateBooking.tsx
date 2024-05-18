@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   FormRoot,
@@ -24,6 +24,7 @@ import Backdrop from "../components/modal/ModalBackdrop";
 interface FormData {
   first_name: string;
   surname: string;
+  group_name?: string;
   contact_number: string;
   email_address: string;
   house_number: string;
@@ -31,19 +32,24 @@ interface FormData {
   city: string;
   postcode: string;
   booking_date: string;
+  total_passengers: number;
   wheelchair_users: number;
   smoking: boolean;
   destination: string;
   lunch_arrangements: string;
-  notes?: string | undefined;
+  notes?: string;
   terms_and_conditions: boolean;
   group_leader_policy: boolean;
-  total_passengers: number;
-  group_name?: string | undefined;
-  skipper?: string | undefined;
-  crew1?: string | undefined;
-  crew2?: string | undefined;
-  // Need to add group size
+  skipper?: string;
+  crew1?: string;
+  crew2?: string;
+}
+
+interface Volunteer {
+  surname: string;
+  first_name: string;
+  name: string;
+  role: string;
 }
 
 const isBookingDateAvailable = async (date: string) => {
@@ -128,6 +134,7 @@ const schema = yup.object().shape({
   skipper: yup.string().notRequired(),
   crew1: yup.string().notRequired(),
   crew2: yup.string().notRequired(),
+  adminOther: yup.string().notRequired(),
 });
 
 
@@ -138,6 +145,11 @@ const CreateBooking: React.FC = () => {
   const [showModal, setShowModal] = React.useState<boolean>(false);
   const [formData, setFormData] = React.useState<FormData | null>(null);
   const [selectedDestination, setSelectedDestination] = React.useState<string | null>(null);
+  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
+  const [skippers, setSkippers] = useState<string[]>([]);
+  const [crew1, setCrew1] = useState<string[]>([]);
+  const [crew2, setCrew2] = useState<string[]>([]);
+  const [adminOther, setAdminOther] = useState<string[]>([]);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -146,7 +158,89 @@ const CreateBooking: React.FC = () => {
   const selectedDate = queryParams.get('date');
 
 
+  // fetch list of volunteers from adejord.co.uk/volunteers
+  useEffect(() => {
+    const fetchVolunteers = async () => {
+      try {
+        const response = await axios.get("https://adejord.co.uk/volunteers");
+        console.log("API Response:", response.data); // Log to confirm the response data
+        setVolunteers(response.data);
+      } catch (error) {
+        console.error("Error fetching volunteers:", error);
+      }
+    };
+    fetchVolunteers();
+  }, []);
 
+  // filter skippers, crew1 and crew2 from volunteers for asigning crew dropdowns
+  useEffect(() => {
+    console.log("Volunteers for filtering:", volunteers); // Log to check volunteers before filtering
+
+    const filteredSkippers = volunteers
+      .filter(volunteer => {
+        if (volunteer.role) {
+          const role = volunteer.role.trim().toLowerCase();
+          console.log("Checking volunteer role (trimmed and lowercased):", role); // Log each volunteer's role
+          return role === 'skipper';
+        } else {
+          console.log("Volunteer with no role or null role:", volunteer);
+          return false;
+        }
+      })
+      .map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
+    console.log("Filtered Skippers:", filteredSkippers); // Log the filtered result
+    setSkippers(filteredSkippers);
+
+    const filteredCrew1 = volunteers
+      .filter(volunteer => {
+        if (volunteer.role) {
+          const role = volunteer.role.trim().toLowerCase();
+          return role === 'crew1';
+        } else {
+          return false;
+        }
+      })
+      .map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
+    setCrew1(filteredCrew1);
+
+    const filteredCrew2 = volunteers
+      .filter(volunteer => {
+        if (volunteer.role) {
+          const role = volunteer.role.trim().toLowerCase();
+          return role === 'crew2';
+        } else {
+          return false;
+        }
+      })
+      .map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
+    setCrew2(filteredCrew2);
+
+    const filteredAdminOther = volunteers
+      .filter(volunteer => {
+        if (volunteer.role) {
+          const role = volunteer.role.trim().toLowerCase();
+          return role === 'admin/other';
+        } else {
+          return false;
+        }
+      })
+      .map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
+    setAdminOther(filteredAdminOther);
+  }, [volunteers]);
+
+  const onSubmit: SubmitHandler<FormData> = async data => {
+    console.log(data); // Logs the form data
+    try {
+      const response = await axios.post("https://adejord.co.uk/addVolunteers", data);
+      console.log("Response from API:", response.data);
+      // Handle successful response
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      // Handle submission error
+    }
+  };
+
+  // Helper function to handle modal click
   const ModalClickHandler = () => {
     setShowModal(false);
     navigate('/');
@@ -201,17 +295,13 @@ const CreateBooking: React.FC = () => {
     </>
   );
 
-
-
   // Function to send data to the createBooking endpoint
   const submitBooking: SubmitHandler<FormData> = async (data) => {
     try {
       const response = await axios.post("https://adejord.co.uk/createBooking", data);
-
-      // console.log("Booking created successfully:", response.data);
       setFormData(data);
-      console.log(formData)// returns null?
       setShowModal(true);
+      console.log("Booking created successfully:", response.data);
 
       // Send email with specific properties
       const {
@@ -254,13 +344,13 @@ const CreateBooking: React.FC = () => {
         notes,
         terms_and_conditions,
         group_leader_policy,
+
       });
 
-      // You can perform additional actions after a successful booking creation here
+      console.log("Booking confirmation email sent successfully");
 
     } catch (error) {
       console.error("Error creating booking:", error);
-      // Handle error scenarios here
     }
   };
 
@@ -280,7 +370,7 @@ const CreateBooking: React.FC = () => {
   });
 
   // Set the booking_date field value if selectedDate is available
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedDate) {
       setValue('booking_date', selectedDate);
     }
@@ -505,16 +595,37 @@ const CreateBooking: React.FC = () => {
             Assign Crew
           </GroupLabel>
           <GroupLabel>
-            Skipper
-            <Input type="text" {...register("skipper")} />
+            <label htmlFor="skipper">Skipper</label>
+            <select id="skipper" {...register("skipper")}>
+              <option value="">Select a skipper</option>
+              {skippers.map((skipper, index) => (
+                <option key={index} value={skipper}>
+                  {skipper}
+                </option>
+              ))}
+            </select>
           </GroupLabel>
           <GroupLabel>
-            1st Crew
-            <Input type="text" {...register("crew1")} />
+            <label htmlFor="crew1">1st Crew</label>
+            <select id="crew1" {...register("crew1")}>
+              <option value="">Select a 1st Crew</option>
+              {crew1.map((crew1, index) => (
+                <option key={index} value={crew1}>
+                  {crew1}
+                </option>
+              ))}
+            </select>
           </GroupLabel>
           <GroupLabel>
-            2nd Crew
-            <Input type="text" {...register("crew2")} />
+            <label htmlFor="crew2">2nd Crew</label>
+            <select id="crew2" {...register("crew2")}>
+              <option value="">Select a 2nd Crew</option>
+              {crew2.map((crew2, index) => (
+                <option key={index} value={crew2}>
+                  {crew2}
+                </option>
+              ))}
+            </select>
           </GroupLabel>
           <br />
           <FormButton type="submit">Submit</FormButton>

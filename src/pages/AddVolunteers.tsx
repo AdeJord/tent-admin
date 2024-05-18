@@ -25,6 +25,7 @@ interface FormData {
   notes?: string | undefined;
 }
 
+const validRoles = ['Skipper', 'Crew1', 'Crew2', 'Admin/other'];
 
 const schema = yup.object().shape({
   first_name: yup.string().required('You must enter a first name'),
@@ -35,7 +36,7 @@ const schema = yup.object().shape({
   street_name: yup.string().required('You must enter a street name'),
   city: yup.string().required('You must enter a city'),
   postcode: yup.string().required('You must enter a postcode'),
-  role: yup.string().required("Please let us know what role the volunteer does"),
+  role: yup.string().oneOf(validRoles, 'Invalid role').required("Please let us know what role the volunteer does"),
   notes: yup.string().notRequired(),
 });
 
@@ -65,50 +66,20 @@ const AddVolunteers: React.FC = () => {
     try {
       const response = await axios.post("https://adejord.co.uk/addVolunteers", data);
 
-      // console.log("Booking created successfully:", response.data);
       setFormData(data);
-      console.log(formData)
       setShowModal(true);
-
-      // Send email with specific properties
-    //   const { 
-    //     first_name, 
-    //     surname,
-    //     contact_number,
-    //     email_address, 
-    //     house_number,
-    //     street_name,
-    //     city,
-    //     postcode,
-    //     notes
-    //    } = data;
-    //   await axios.post("https://adejord.co.uk/sendEmail", { 
-    //     email_address, 
-    //     first_name, 
-    //     surname,
-    //     contact_number,
-    //     house_number,
-    //     street_name,
-    //     city,
-    //     postcode,
-    //     notes
-    //    });
-
-      // You can perform additional actions after a successful booking creation here
 
     } catch (error) {
       console.error("Error adding volunteer: - ", error);
-      // Handle error scenarios here
     }
   };
-
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: yupResolver(schema) as unknown as MyResolverType, // yup, joi and even your own.
+    resolver: yupResolver(schema) as unknown as MyResolverType,
   });
 
   return (
@@ -137,7 +108,6 @@ const AddVolunteers: React.FC = () => {
           }}
           onSubmit={handleSubmit((data: FormData) => {
             submitVolunteer(data);
-            // console.log(data); 
           })}
         >
           <label>First Name</label>
@@ -212,9 +182,9 @@ const AddVolunteers: React.FC = () => {
             <label>
               <input
                 type="radio"
-                value="Skippper"
+                value="Skipper"
                 {...register("role")}
-                onChange={() => setRole("Skippper")}
+                onChange={() => setRole("Skipper")}
               />
               Skipper
             </label>
@@ -222,32 +192,36 @@ const AddVolunteers: React.FC = () => {
             <label>
               <input
                 type="radio"
-                value="Crew"
+                value="Crew1"
                 {...register("role")}
-                onChange={() => setRole("Crew")}
+                onChange={() => setRole("Crew1")}
               />
-              Crew Member
-              {errors.role && (
-                <p style={{ color: "red" }}>{errors.role.message}</p>
-              )}
-              <br />
+              Crew1
             </label>
+            <br />
             <label>
               <input
                 type="radio"
-                value="Other"
+                value="Crew2"
                 {...register("role")}
-                onChange={() => setRole("Other")}
+                onChange={() => setRole("Crew2")}
               />
-              Admin/Other
-              {errors.role && (
-                <p style={{ color: "red" }}>{errors.role.message}</p>
-              )}
+              Crew2
             </label>
-          </div>
-          <br />
-
-          <div>
+            <br />
+            <label>
+              <input
+                type="radio"
+                value="Admin/other"
+                {...register("role")}
+                onChange={() => setRole("Admin/other")}
+              />
+              Admin/other
+            </label>
+            {errors.role && (
+              <p style={{ color: "red" }}>{errors.role.message}</p>
+            )}
+            <br />
           </div>
           <br />
           <label>Notes</label>
