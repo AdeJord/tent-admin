@@ -33,6 +33,15 @@ function Home() {
                     <Link style={{ textDecoration: 'none' }} to="/news">View/Edit News</Link>
                 </ContainerPartition>
             </Container>
+            <Container>
+                Gallery Images
+                <ContainerPartition>
+                    <Link style={{ textDecoration: 'none' }} to='/AddGalleryImages'>Add Gallery Images</Link>
+                </ContainerPartition>
+                <ContainerPartition>
+                    <Link style={{ textDecoration: 'none' }} to="/EditGalleryImages">View/Edit Gallery Images</Link>
+                </ContainerPartition>
+            </Container>
             <h2
                 style={{
                     textAlign: 'center',

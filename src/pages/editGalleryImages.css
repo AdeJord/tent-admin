@@ -1,0 +1,39 @@
+/* Style the overall container to match the background */
+.container {
+    background-color: #f0f5f5; /* Adjust the color to match the exact green */
+    padding: 20px;
+  }
+  
+  /* Customize Ant Design input fields */
+  .ant-input {
+    border: 1px solid #d9d9d9; /* Light gray border */
+    border-radius: 4px; /* Rounded corners */
+  }
+  
+  /* Customize the text area specifically */
+  .ant-input-textarea {
+    border: 1px solid #d9d9d9; /* Light gray border */
+    border-radius: 4px; /* Rounded corners */
+  }
+  
+  /* Style the labels for a consistent look */
+  .label {
+    color: #000; /* Dark text for visibility */
+    font-size: 16px; /* Slightly larger font size */
+    margin-bottom: 8px; /* Spacing between label and input */
+    display: block; /* Makes it easier to manage layout */
+  }
+  
+  /* Customize the Ant Design button */
+  .ant-btn {
+    background-color: #c8e1c8; /* Pale green background */
+    border: none; /* Remove default border */
+    color: black; /* Black text */
+  }
+  
+  /* Optionally customize the date picker */
+  .ant-picker {
+    border: 1px solid #d9d9d9;
+  }
+  
+  

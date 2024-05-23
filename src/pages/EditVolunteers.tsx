@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Modal from '../components/modal/Modal';
 import DangerModal from '../components/modal/DangerModal';
 import Backdrop from '../components/modal/ModalBackdrop';
-import { Root, FormRoot, FormContainer, Button, ButtonContainer } from '../styles';
-import { set } from 'date-fns';
+import { Root, FormRoot, FormContainer, Button } from '../styles';
 
 const BASE_URL = 'https://adejord.co.uk'; // Replace with your API base URL
 
-// Define the fetchBookingData function
+// Define the fetchVolunteerData function
 const fetchVolunteerData = async (volunteerId: any) => {
     try {
         const response = await axios.get(`${BASE_URL}/getVolunteerById/${volunteerId}`);
@@ -20,7 +19,7 @@ const fetchVolunteerData = async (volunteerId: any) => {
     }
 };
 
-// Function to update booking data by volunteerId
+// Function to update volunteer data by volunteerId
 export const updateVolunteerData = async (volunteerId: any, formData: any) => {
     try {
         const response = await axios.patch(`${BASE_URL}/updateVolunteer/${volunteerId}`, formData);
@@ -31,7 +30,7 @@ export const updateVolunteerData = async (volunteerId: any, formData: any) => {
     }
 };
 
-// Function to delete booking data by bookingId
+// Function to delete volunteer data by volunteerId
 const deleteVolunteerData = async (volunteerId: any) => {
     try {
         const response = await axios.delete(`${BASE_URL}/deleteVolunteer/${volunteerId}`);
@@ -59,11 +58,11 @@ const EditVolunteers = () => {
         postcode: '',
         role: '',
         notes: '',
-
-        // Add other fields here
     });
 
-    // Fetch booking data based on bookingId (useEffect to fetch data when the component mounts)
+    const roles = ['Skipper', '1st Crew', '2nd Crew', 'Admin/Other'];
+
+    // Fetch volunteer data based on volunteerId (useEffect to fetch data when the component mounts)
     useEffect(() => {
         if (!volunteerId) {
             console.error('No Volunteer Id provided');
@@ -80,7 +79,7 @@ const EditVolunteers = () => {
     }, [volunteerId]);
 
     // Handle form input changes
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData({
             ...formData,
@@ -88,18 +87,16 @@ const EditVolunteers = () => {
         });
     };
 
-
-
     // Handle form submission (you can customize this part based on your API)
     const handleSubmit = (e: { preventDefault: () => void; }) => {
         e.preventDefault();
-        updateVolunteerData(Number (volunteerId), formData)
+        updateVolunteerData(Number(volunteerId), formData)
             .then(() => {
                 setShowSuccessModal(true); // Show the success modal on successful update
             })
             .catch((error) => {
                 console.error(error);
-                console.log('error updating volunteer (On Submit')
+                console.log('error updating volunteer (On Submit)')
                 setShowDangerModal(true); // Show the danger modal on error
             });
     };
@@ -188,9 +185,11 @@ const EditVolunteers = () => {
                                     type="submit"
                                     style={{ backgroundColor: "red", color: "#051101", fontSize: "calc(5px + 2vmin)" }}
                                 >DELETE</Button>
-                            </div>} onClose={function (): void {
+                            </div>}
+                            onClose={function (): void {
                                 throw new Error('Function not implemented.');
-                            } }                        />
+                            }}
+                        />
                     </Backdrop>
                 )}
 
@@ -271,13 +270,19 @@ const EditVolunteers = () => {
                             onChange={handleInputChange}
                         />
                         <label>Role:</label>
-                        <input
+                        <select
                             style={{ width: "20vw" }}
-                            type="text"
-                            name="destination"
+                            name="role"
                             value={formData.role}
                             onChange={handleInputChange}
-                        />
+                        >
+                            <option value="">Select a role</option>
+                            {roles.map((role, index) => (
+                                <option key={index} value={role}>
+                                    {role}
+                                </option>
+                            ))}
+                        </select>
                         <label>Notes:</label>
                         <input
                             style={{ width: "20vw" }}
