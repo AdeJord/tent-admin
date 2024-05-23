@@ -26,7 +26,7 @@ export const Root = styled.div`
 
 export const FormRoot = styled.div`
   background-color: #eaf3e7;
-  height: 185vh;
+  height: auto;
   width: 100vw;
   display: flex;
   flex-direction: column;
@@ -37,7 +37,7 @@ export const FormRoot = styled.div`
 `;
 
 export const FormContainer = styled.div`
-  background-color: #ffffff;
+  background-color: gray;
   border: 1px solid #dcdcdc;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -93,6 +93,34 @@ export const ButtonContainer = styled.div`
   font-family: "Roboto, Arial, Helvetica, sans-serif";
 `;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export const Header = styled.div`
   display: flex;
   flex-direction: row; 
@@ -110,17 +138,38 @@ export const Header = styled.div`
   }
 `;
 
-
 export const HeaderDiv = styled.div`
   display: flex;
-  flex: 2 0 55%;  // Takes up 55% of the space, no shrinking
+  flex: 2 0 55%;
   align-items: center;
+  background-color: black; /* Ensure the background is black */
+  padding: 10px; /* Add padding to avoid content touching the edges */
 
   @media (max-width: 768px) {
-    flex: 1 0 100%;  // Full width on smaller screens
+    flex: 1 0 100%;
     justify-content: center;
   }
 `;
+
+export const StyledGreeting = styled.p`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  height: 10%
+  // background-color: black; /* Match the parent background */
+  background-color: red;
+  color: #EAF3E7;
+  font-size: 15px; /* Default font size */
+  padding: 10px 20px;
+  margin: 0; /* Remove default margin */
+  border-radius: 5px; /* Slight rounding for aesthetics */
+
+  @media (max-width: 768px) {
+    font-size: 12px; /* Smaller font size on small devices */
+  }
+`;
+
 
 export const HeaderSideDiv = styled.div`
   display: flex;
@@ -135,6 +184,32 @@ export const HeaderSideDiv = styled.div`
     margin-top: 10px;
   }
 `;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export const Container = styled.div`
   height: 20vh;
@@ -321,22 +396,23 @@ export const TableContainer = styled.div`
 `;
 
 export const ModalRoot = styled.div`
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  z-index: 100;
-  height: auto; 
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); 
+  z-index: 105;
   width: auto; 
   display: flex;
   flex-direction: column;
   align-items: center;
-  left: 50;
-  top: 50;
   font-size: calc(8px + 2vmin);
-  color: #333; 
+  color: #333;
   font-family: "Roboto, Arial, Helvetica, sans-serif";
-  transition: all 0.3s ease;
-  border-radius: 10px; /* Rounded corners */
-  margin-top: -40vh; // Adjust as needed to move the modal up
-  background-color: #f8f8f8; /* Softer background color */
+  transition: all 0.6s ease;
+  border-radius: 10px;
+  background-color: #f8f8f8;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
 `;
 
 export const ModalHeader = styled.div`
@@ -381,13 +457,12 @@ export const ModalFooter = styled.div`
   border-bottom-right-radius: 10px; /* Rounded corners */
 `;
 
-
 export const DangerModalRoot = styled.div`
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   z-index: 100;
-  max-width: 600px; // Maximum width of the modal
-  width: auto; // Modal width is 90% of the viewport width, until it reaches the max-width
-  height: auto; // Let the modal size fit the content
+  max-width: 600px;
+  width: auto;
+  height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -395,13 +470,13 @@ export const DangerModalRoot = styled.div`
   color: white;
   font-family: "Roboto, Arial, Helvetica, sans-serif";
   transition: all 0.3s ease;
-  border-radius: 15px; // Soft rounded corners
-  margin-top: -40vh; // Adjust as needed to move the modal up
-  margin-left: auto; // Center the modal horizontally
-  margin-right: auto; // Center the modal horizontally
-  background-color: #ffebee; // Very light red background
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); // Soft shadow for depth
-  position: relative; // For absolute positioning of children
+  border-radius: 15px;
+  background-color: #ffebee;
+  position: fixed; /* Changed to fixed to ensure it's always in view */
+  top: 50%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%); /* Adjust for true centering */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 `;
 
 export const DangerModalHeader = styled.div`
@@ -523,7 +598,7 @@ export const Input = styled.input`
   }
   `;
 
-  export const Label = styled.label`
+export const Label = styled.label`
   display: block;
   margin-bottom: 5px;
   color: #333;
