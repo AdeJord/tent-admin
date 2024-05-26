@@ -382,25 +382,11 @@ const CreateBooking: React.FC = () => {
       <h1>Internal Booking Form</h1>
       <FormContainer>
         <form onSubmit={handleSubmit(submitBooking)}>
-          <div
-            style={{
-              width: "100%",
-              textAlign: "center",
-              display: "flex",
-            }}
-          >
-            <div
-              style={{
-                width: "100%",
-                textAlign: "center",
-                display: "flex",
-                flexDirection: "column",
-                paddingBottom: "1em",
-              }}
-            >
+          <>
+            <>
               Booking Date {/* Render label as a paragraph */}
-            </div>
-          </div>
+            </>
+          </>
           <div style={{ textAlign: "center" }}>
             {selectedDate
               ? new Date(selectedDate).toLocaleDateString("en-GB")

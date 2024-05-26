@@ -41,7 +41,7 @@ export const FormContainer = styled.div`
   border: 1px solid #dcdcdc;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
+  max-width: 600px;
   width: 90%;
   display: flex;
   flex-direction: column;
@@ -51,8 +51,51 @@ export const FormContainer = styled.div`
   font-family: 'Roboto, Arial, Helvetica, sans-serif';
   color: #333;
   font-size: 1rem;
+  
+  @media (max-width: 600px) {
+    // padding: 1rem;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 400px) {
+    // padding: 0.5rem;
+    font-size: 0.8rem;
+  }
 `;
 
+export const Input = styled.input`
+  // width: calc(100% - 1rem);
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+
+  @media (max-width: 600px) {
+    // width: calc(100% - 0.8rem);
+    padding: 0.4rem;
+  }
+
+  @media (max-width: 400px) {
+    // width: calc(100% - 0.6rem);
+    padding: 0.3rem;
+  }
+`;
+
+export const Label = styled.label`
+  width: 100%;
+  margin-bottom: 0.5rem;
+  color: black;
+  font-size: 1rem;
+
+  @media (max-width: 600px) {
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 400px) {
+    font-size: 0.8rem;
+  }
+`;
 
 
 export const FormSection = styled.div`
@@ -584,26 +627,7 @@ button {
 // }
 `;
 
-export const Input = styled.input`
-  width: 80%;
-  min-width: 200px;
-  padding: 8px;
-  margin: 8px 0;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
 
-  &[type="number"], &[type="radio"] {
-    width: 30%; 
-  }
-  `;
-
-export const Label = styled.label`
-  display: block;
-  margin-bottom: 5px;
-  color: #333;
-  text-align: left
-`;
 
 export const ErrorMessage = styled.p`
   color: red;
