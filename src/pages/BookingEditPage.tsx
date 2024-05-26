@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as yup from 'yup';
 import Modal from '../components/modal/Modal';
 import DangerModal from '../components/modal/DangerModal';
 import Backdrop from '../components/modal/ModalBackdrop';
@@ -14,9 +16,6 @@ import {
     Label,
     NarrowInput,
 } from '../styles';
-import { Resolver, useForm } from 'react-hook-form';
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from 'yup';
 
 interface FormData {
     first_name: string;
@@ -40,14 +39,14 @@ interface FormData {
     skipper?: string;
     crew1?: string;
     crew2?: string;
-};
+}
 
 interface Volunteer {
     surname: string;
     first_name: string;
     name: string;
     role: string;
-};
+}
 
 const BASE_URL = 'https://adejord.co.uk';
 
@@ -85,7 +84,7 @@ const isBookingDateAvailable = async (date: string) => {
 const updateBookingData = async (bookingId: number, formData: any) => {
     try {
         const response = await axios.patch(`${BASE_URL}/updateBooking/${bookingId}`, formData);
-        console.log('Form Data:', formData)
+        console.log('Form Data:', formData);
         console.log('Response:', response.data);
         return response.data;
     } catch (error) {
@@ -146,10 +145,7 @@ const schema = yup.object().shape({
     skipper: yup.string().notRequired(),
     crew1: yup.string().notRequired(),
     crew2: yup.string().notRequired(),
-    adminOther: yup.string().notRequired(),
 });
-
-type MyResolverType = Resolver<FormData, typeof yupResolver>;
 
 const BookingEditPage = () => {
     const { bookingId } = useParams();
@@ -161,7 +157,6 @@ const BookingEditPage = () => {
     const [skippers, setSkippers] = useState<string[]>([]);
     const [crew1, setCrew1] = useState<string[]>([]);
     const [crew2, setCrew2] = useState<string[]>([]);
-    const [adminOther, setAdminOther] = useState<string[]>([]);
 
     useEffect(() => {
         const fetchVolunteers = async () => {
@@ -185,8 +180,6 @@ const BookingEditPage = () => {
         const filteredCrew2 = volunteers.filter(volunteer => volunteer.role.trim().toLowerCase() === 'crew2').map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
         setCrew2(filteredCrew2);
 
-        const filteredAdminOther = volunteers.filter(volunteer => volunteer.role.trim().toLowerCase() === 'admin/other').map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
-        setAdminOther(filteredAdminOther);
     }, [volunteers]);
 
     const [formData, setFormData] = useState<FormData>({
@@ -213,30 +206,38 @@ const BookingEditPage = () => {
         crew2: "",
     });
 
+    useEffect(() => {
+        if (!bookingId) {
+            console.error('No booking Id provided');
+            return;
+        }
 
-//NOT UPDATING THE FORM DATA
-// SENDING EMPTY ARRAY
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
-    };
-
-    const handleSubmit = (e: { preventDefault: () => void; }) => {
-        e.preventDefault();
-        updateBookingData(Number(bookingId), formData)
-            .then(() => {
-                setShowSuccessModal(true);
-                console.log('Booking Data', formData)
+        fetchBookingData(bookingId)
+            .then((fetchedData) => {
+                console.log('Fetched Data:', fetchedData); // Debug statement
+                setFormData(fetchedData);
             })
             .catch((error) => {
-                console.error("Error in BookingEditPage:", error.message);
-                setShowDangerModal(true);
+                console.error(error);
             });
-    };
+    }, [bookingId]);
 
+    const handleSubmit = async (values: FormData) => {
+        console.log('Form values on submit:', values); // Debug statement
+        try {
+          await updateBookingData(Number(bookingId), values);
+          setShowSuccessModal(true);
+          console.log('Booking Data', values);
+        } catch (error) {
+          if (error instanceof Error) {
+            console.error("Error in BookingEditPage:", error.message);
+          } else {
+            console.error("An unknown error occurred");
+          }
+          setShowDangerModal(true);
+        }
+      };
+      
     const handleDangerModalOpen = () => {
         setShowSuccessModal(false);
         setShowDangerModal(true);
@@ -273,29 +274,6 @@ const BookingEditPage = () => {
         setShowDangerModal(false);
     }
 
-    const { register, formState: { errors }, setValue } = useForm<FormData>({
-        resolver: yupResolver(schema) as unknown as MyResolverType,
-    });
-
-    useEffect(() => {
-        if (!bookingId) {
-            console.error('No booking Id provided');
-            return;
-        }
-
-        fetchBookingData(bookingId)
-            .then((fetchedData) => {
-                setFormData(fetchedData);
-                // Set default skipper, crew1, and crew2 values in the form
-                setValue('skipper', fetchedData.skipper);
-                setValue('crew1', fetchedData.crew1);
-                setValue('crew2', fetchedData.crew2);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    }, [bookingId, setValue]);
-
     return (
         <Root>
             <FormRoot>
@@ -331,103 +309,144 @@ const BookingEditPage = () => {
                                 }}>
                                 <Button onClick={handleDangerModalCancel} type="submit" style={{ backgroundColor: "#EAF3E7", color: "#051101", fontSize: "calc(5px + 2vmin)" }}>CANCEL</Button>
                                 <Button onClick={handleDangerModalDeleteClick} type="submit" style={{ backgroundColor: "red", color: "#051101", fontSize: "calc(5px + 2vmin)" }}>DELETE</Button>
-                            </div>} onClose={function (): void {
-                                throw new Error('Function not implemented.');
-                            } }                        />
+                            </div>} onClose={() => setShowDangerModal(false)}
+                        />
                     </Backdrop>
                 )}
 
                 <h1>Edit Booking</h1>
                 <FormContainer>
-                    <form
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            paddingTop: "2vh",
-                            height: "auto",
-                            width: "30vw",
-                        }}
-                        onSubmit={handleSubmit}>
+                    <Formik
+                        initialValues={formData}
+                        // validationSchema={schema}
+                        onSubmit={handleSubmit}
+                        enableReinitialize
+                    >
+                        {({ values, handleChange }) => (
+                            <>
+                                {console.log('Rendering Formik form')} {/* Debug statement */}
+                                <Form style={{ display: "flex", flexDirection: "column", paddingTop: "2vh", height: "auto", width: "30vw" }}>
+                                    <Label>First Name:</Label>
+                                    <Field type="text" name="first_name" as={Input} />
+                                    <ErrorMessage name="first_name" component="div" />
 
-                        <Label>First Name:</Label>
-                        <Input type="text" name="first_name" value={formData.first_name} onChange={handleInputChange} />
-                        <Label>Surname:</Label>
-                        <Input type="text" name="surname" value={formData.surname} onChange={handleInputChange} />
-                        <Label>Group/Org name:</Label>
-                        <Input type="text" name="group_name" value={formData.group_name} onChange={handleInputChange} />
-                        <Label>Contact Number:</Label>
-                        <Input type="text" name="contact_number" value={formData.contact_number} onChange={handleInputChange} />
-                        <Label>Email Address:</Label>
-                        <Input type="text" name="email_address" value={formData.email_address} onChange={handleInputChange} />
-                        <Label>House Number:</Label>
-                        <Input type="text" name="house_number" value={formData.house_number} onChange={handleInputChange} />
-                        <Label>Street Name:</Label>
-                        <Input type="text" name="street_name" value={formData.street_name} onChange={handleInputChange} />
-                        <Label>City:</Label>
-                        <Input type="text" name="city" value={formData.city} onChange={handleInputChange} />
-                        <Label>Postcode:</Label>
-                        <NarrowInput type="text" name="postcode" value={formData.postcode} onChange={handleInputChange} />
-                        <Label>Booking Date:</Label>
-                        <NarrowInput type="text" name="booking_date" value={new Date(formData.booking_date).toLocaleDateString('en-GB')} onChange={handleInputChange} />
-                        <Label>Passengers:</Label>
-                        <NarrowInput type="text" name="total_passengers" value={formData.total_passengers} onChange={handleInputChange} />
-                        <Label>Wheelchair Users:</Label>
-                        <NarrowInput type="text" name="wheelchair_users" value={formData.wheelchair_users} onChange={handleInputChange} />
-                        <Label>Smoking:</Label>
-                        <NarrowInput type="text" name="smoking" value={formData.smoking ? "Yes" : "No"} onChange={handleInputChange} />
-                        <Label>Destination:</Label>
-                        <NarrowInput type="text" name="destination" value={formData.destination} onChange={handleInputChange} />
-                        <Label>Lunch Arrangements:</Label>
-                        <Input type="text" name="lunch_arrangements" value={formData.lunch_arrangements} onChange={handleInputChange} />
-                        <Label>Notes:</Label>
-                        <Input type="text" name="notes" value={formData.notes} onChange={handleInputChange} />
-                        <Label>Terms and Conditions:</Label>
-                        <NarrowInput type="text" name="terms_and_conditions" value={formData.terms_and_conditions ? "Agreed" : "Not Agreed"} onChange={handleInputChange} />
-                        <Label>Group Leader Policy:</Label>
-                        <NarrowInput type="text" name="group_leader_policy" value={formData.group_leader_policy ? "Agreed" : "Not Agreed"} onChange={handleInputChange} />
+                                    <Label>Surname:</Label>
+                                    <Field type="text" name="surname" as={Input} />
+                                    <ErrorMessage name="surname" component="div" />
 
-                        <br />
-                        <GroupLabel>Assign Crew</GroupLabel>
-                        <GroupLabel>
-                            <Label htmlFor="skipper">Skipper</Label>
-                            <select id="skipper" {...register("skipper")}>
-                                <option value="">Select a skipper</option>
-                                {skippers.map((skipper, index) => (
-                                    <option key={index} value={skipper}>
-                                        {skipper}
-                                    </option>
-                                ))}
-                            </select>
-                        </GroupLabel>
-                        <GroupLabel>
-                            <Label htmlFor="crew1">1st Crew</Label>
-                            <select id="crew1" {...register("crew1")}>
-                                <option value="">Select a 1st Crew</option>
-                                {crew1.map((crew1, index) => (
-                                    <option key={index} value={crew1}>
-                                        {crew1}
-                                    </option>
-                                ))}
-                            </select>
-                        </GroupLabel>
-                        <GroupLabel>
-                            <Label htmlFor="crew2">2nd Crew</Label>
-                            <select id="crew2" {...register("crew2")}>
-                                <option value="">Select a 2nd Crew</option>
-                                {crew2.map((crew2, index) => (
-                                    <option key={index} value={crew2}>
-                                        {crew2}
-                                    </option>
-                                ))}
-                            </select>
-                        </GroupLabel>
-                        <Button style={{ backgroundColor: 'green', color: 'white', border: 'none' }} type="submit">SAVE CHANGES</Button>
-                        <br />
-                        <div style={{ backgroundColor: 'red', color: 'white', width: '10vw', height: '5vh', borderRadius: '5px', border: '1px solid black', display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '0.5rem', }}>
-                            <Button onClick={() => handleDangerModalOpen()} style={{ backgroundColor: 'red', color: 'white', border: 'none' }} type='button'>DELETE</Button>
-                        </div>
-                        <br />
-                    </form>
+                                    <Label>Group/Org name:</Label>
+                                    <Field type="text" name="group_name" as={Input} />
+                                    <ErrorMessage name="group_name" component="div" />
+
+                                    <Label>Contact Number:</Label>
+                                    <Field type="text" name="contact_number" as={Input} />
+                                    <ErrorMessage name="contact_number" component="div" />
+
+                                    <Label>Email Address:</Label>
+                                    <Field type="text" name="email_address" as={Input} />
+                                    <ErrorMessage name="email_address" component="div" />
+
+                                    <Label>House Number:</Label>
+                                    <Field type="text" name="house_number" as={Input} />
+                                    <ErrorMessage name="house_number" component="div" />
+
+                                    <Label>Street Name:</Label>
+                                    <Field type="text" name="street_name" as={Input} />
+                                    <ErrorMessage name="street_name" component="div" />
+
+                                    <Label>City:</Label>
+                                    <Field type="text" name="city" as={Input} />
+                                    <ErrorMessage name="city" component="div" />
+
+                                    <Label>Postcode:</Label>
+                                    <Field type="text" name="postcode" as={NarrowInput} />
+                                    <ErrorMessage name="postcode" component="div" />
+
+                                    <Label>Booking Date:</Label>
+                                    <Field type="text" name="booking_date" as={NarrowInput} value={new Date(values.booking_date).toLocaleDateString('en-GB')} onChange={handleChange} />
+                                    <ErrorMessage name="booking_date" component="div" />
+
+                                    <Label>Passengers:</Label>
+                                    <Field type="text" name="total_passengers" as={NarrowInput} />
+                                    <ErrorMessage name="total_passengers" component="div" />
+
+                                    <Label>Wheelchair Users:</Label>
+                                    <Field type="text" name="wheelchair_users" as={NarrowInput} />
+                                    <ErrorMessage name="wheelchair_users" component="div" />
+
+                                    <Label>Smoking:</Label>
+                                    <Field type="text" name="smoking" as={NarrowInput} value={values.smoking ? "Yes" : "No"} onChange={handleChange} />
+                                    <ErrorMessage name="smoking" component="div" />
+
+                                    <Label>Destination:</Label>
+                                    <Field type="text" name="destination" as={NarrowInput} />
+                                    <ErrorMessage name="destination" component="div" />
+
+                                    <Label>Lunch Arrangements:</Label>
+                                    <Field type="text" name="lunch_arrangements" as={Input} />
+                                    <ErrorMessage name="lunch_arrangements" component="div" />
+
+                                    <Label>Notes:</Label>
+                                    <Field type="text" name="notes" as={Input} />
+                                    <ErrorMessage name="notes" component="div" />
+
+                                    <Label>Terms and Conditions:</Label>
+                                    <Field type="text" name="terms_and_conditions" as={NarrowInput} value={values.terms_and_conditions ? "Agreed" : "Not Agreed"} onChange={handleChange} />
+                                    <ErrorMessage name="terms_and_conditions" component="div" />
+
+                                    <Label>Group Leader Policy:</Label>
+                                    <Field type="text" name="group_leader_policy" as={NarrowInput} value={values.group_leader_policy ? "Agreed" : "Not Agreed"} onChange={handleChange} />
+                                    <ErrorMessage name="group_leader_policy" component="div" />
+
+                                    <br />
+                                    <GroupLabel>Assign Crew</GroupLabel>
+                                    <GroupLabel>
+                                        <Label htmlFor="skipper">Skipper</Label>
+                                        <Field as="select" id="skipper" name="skipper">
+                                            <option value="">Select a skipper</option>
+                                            {skippers.map((skipper, index) => (
+                                                <option key={index} value={skipper}>
+                                                    {skipper}
+                                                </option>
+                                            ))}
+                                        </Field>
+                                        <ErrorMessage name="skipper" component="div" />
+                                    </GroupLabel>
+                                    <GroupLabel>
+                                        <Label htmlFor="crew1">1st Crew</Label>
+                                        <Field as="select" id="crew1" name="crew1">
+                                            <option value="">Select a 1st Crew</option>
+                                            {crew1.map((crew, index) => (
+                                                <option key={index} value={crew}>
+                                                    {crew}
+                                                </option>
+                                            ))}
+                                        </Field>
+                                        <ErrorMessage name="crew1" component="div" />
+                                    </GroupLabel>
+                                    <GroupLabel>
+                                        <Label htmlFor="crew2">2nd Crew</Label>
+                                        <Field as="select" id="crew2" name="crew2">
+                                            <option value="">Select a 2nd Crew</option>
+                                            {crew2.map((crew, index) => (
+                                                <option key={index} value={crew}>
+                                                    {crew}
+                                                </option>
+                                            ))}
+                                        </Field>
+                                        <ErrorMessage name="crew2" component="div" />
+                                    </GroupLabel>
+
+                                    <Button type="submit" style={{ backgroundColor: 'green', color: 'white', border: 'none' }}>SAVE CHANGES</Button>
+                                    <br />
+                                    <div style={{ backgroundColor: 'red', color: 'white', width: '10vw', height: '5vh', borderRadius: '5px', border: '1px solid black', display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '0.5rem' }}>
+                                        <Button onClick={handleDangerModalOpen} style={{ backgroundColor: 'red', color: 'white', border: 'none' }} type='button'>DELETE</Button>
+                                    </div>
+                                    <br />
+                                </Form>
+                            </>
+                        )}
+                    </Formik>
                 </FormContainer>
             </FormRoot>
         </Root>
