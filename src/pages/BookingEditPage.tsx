@@ -81,10 +81,14 @@ const isBookingDateAvailable = async (date: string) => {
     }
 };
 
-const updateBookingData = async (bookingId: number, formData: any) => {
+const updateBookingData = async (bookingId: number, formData: FormData) => {
     try {
-        const response = await axios.patch(`${BASE_URL}/updateBooking/${bookingId}`, formData);
-        console.log('Form Data:', formData);
+        const dataToSend = {
+            ...formData,
+            booking_date: new Date(formData.booking_date).toISOString(), // Convert to ISO string for server
+        };
+        const response = await axios.patch(`${BASE_URL}/updateBooking/${bookingId}`, dataToSend);
+        console.log('Form Data:', dataToSend);
         console.log('Response:', response.data);
         return response.data;
     } catch (error) {
@@ -113,26 +117,14 @@ const schema = yup.object().shape({
     city: yup.string().required('You must enter a city'),
     postcode: yup.string().required('You must enter a postcode'),
     booking_date: yup
-        .string()
+        .date()
         .required('You must select a date')
-        .test({
-            name: 'is-future-date',
-            message: 'Please select a future date!',
-            test: function (value) {
-                const currentDate = new Date();
-                const selectedDate = new Date(value);
-                return selectedDate > currentDate;
-            },
-        })
-        .test({
-            name: 'is-booking-date-available',
-            message: 'There is already a booking on this date, please choose another',
-            test: async function (value) {
-                if (value) {
-                    return await isBookingDateAvailable(value);
-                }
-                return false;
-            },
+        .min(new Date(), 'Please select a future date!')
+        .test('is-booking-date-available', 'There is already a booking on this date, please choose another', async (value) => {
+            if (value) {
+                return await isBookingDateAvailable(value.toISOString());
+            }
+            return false;
         }),
     total_passengers: yup.number().required('Total passengers is required').oneOf([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Maximum of 12 passengers per booking"),
     wheelchair_users: yup.number().required('Wheelchair user count is required').oneOf([0, 1, 2], "Maximum of 2 wheelchair users per booking"),
@@ -215,6 +207,7 @@ const BookingEditPage = () => {
         fetchBookingData(bookingId)
             .then((fetchedData) => {
                 console.log('Fetched Data:', fetchedData); // Debug statement
+                fetchedData.booking_date = new Date(fetchedData.booking_date).toISOString().split('T')[0]; // Format the date for input
                 setFormData(fetchedData);
             })
             .catch((error) => {
@@ -225,19 +218,19 @@ const BookingEditPage = () => {
     const handleSubmit = async (values: FormData) => {
         console.log('Form values on submit:', values); // Debug statement
         try {
-          await updateBookingData(Number(bookingId), values);
-          setShowSuccessModal(true);
-          console.log('Booking Data', values);
+            await updateBookingData(Number(bookingId), values);
+            setShowSuccessModal(true);
+            console.log('Booking Data', values);
         } catch (error) {
-          if (error instanceof Error) {
-            console.error("Error in BookingEditPage:", error.message);
-          } else {
-            console.error("An unknown error occurred");
-          }
-          setShowDangerModal(true);
+            if (error instanceof Error) {
+                console.error("Error in BookingEditPage:", error.message);
+            } else {
+                console.error("An unknown error occurred");
+            }
+            setShowDangerModal(true);
         }
-      };
-      
+    };
+
     const handleDangerModalOpen = () => {
         setShowSuccessModal(false);
         setShowDangerModal(true);
@@ -307,8 +300,8 @@ const BookingEditPage = () => {
                                     display: "flex",
                                     flexDirection: "row",
                                 }}>
-                                <Button onClick={handleDangerModalCancel} type="submit" style={{ backgroundColor: "#EAF3E7", color: "#051101", fontSize: "calc(5px + 2vmin)" }}>CANCEL</Button>
-                                <Button onClick={handleDangerModalDeleteClick} type="submit" style={{ backgroundColor: "red", color: "#051101", fontSize: "calc(5px + 2vmin)" }}>DELETE</Button>
+                                <Button onClick={handleDangerModalCancel} type="button" style={{ backgroundColor: "#EAF3E7", color: "#051101", fontSize: "calc(5px + 2vmin)" }}>CANCEL</Button>
+                                <Button onClick={handleDangerModalDeleteClick} type="button" style={{ backgroundColor: "red", color: "#051101", fontSize: "calc(5px + 2vmin)" }}>DELETE</Button>
                             </div>} onClose={() => setShowDangerModal(false)}
                         />
                     </Backdrop>
@@ -318,7 +311,7 @@ const BookingEditPage = () => {
                 <FormContainer>
                     <Formik
                         initialValues={formData}
-                        // validationSchema={schema}
+                        validationSchema={schema}
                         onSubmit={handleSubmit}
                         enableReinitialize
                     >
@@ -363,15 +356,15 @@ const BookingEditPage = () => {
                                     <ErrorMessage name="postcode" component="div" />
 
                                     <Label>Booking Date:</Label>
-                                    <Field type="text" name="booking_date" as={NarrowInput} value={new Date(values.booking_date).toLocaleDateString('en-GB')} onChange={handleChange} />
+                                    <Field type="date" name="booking_date" as={NarrowInput} onChange={handleChange} />
                                     <ErrorMessage name="booking_date" component="div" />
 
                                     <Label>Passengers:</Label>
-                                    <Field type="text" name="total_passengers" as={NarrowInput} />
+                                    <Field type="number" name="total_passengers" as={NarrowInput} />
                                     <ErrorMessage name="total_passengers" component="div" />
 
                                     <Label>Wheelchair Users:</Label>
-                                    <Field type="text" name="wheelchair_users" as={NarrowInput} />
+                                    <Field type="number" name="wheelchair_users" as={NarrowInput} />
                                     <ErrorMessage name="wheelchair_users" component="div" />
 
                                     <Label>Smoking:</Label>
@@ -391,11 +384,11 @@ const BookingEditPage = () => {
                                     <ErrorMessage name="notes" component="div" />
 
                                     <Label>Terms and Conditions:</Label>
-                                    <Field type="text" name="terms_and_conditions" as={NarrowInput} value={values.terms_and_conditions ? "Agreed" : "Not Agreed"} onChange={handleChange} />
+                                    <Field type="checkbox" name="terms_and_conditions" as={NarrowInput} onChange={handleChange} />
                                     <ErrorMessage name="terms_and_conditions" component="div" />
 
                                     <Label>Group Leader Policy:</Label>
-                                    <Field type="text" name="group_leader_policy" as={NarrowInput} value={values.group_leader_policy ? "Agreed" : "Not Agreed"} onChange={handleChange} />
+                                    <Field type="checkbox" name="group_leader_policy" as={NarrowInput} onChange={handleChange} />
                                     <ErrorMessage name="group_leader_policy" component="div" />
 
                                     <br />
