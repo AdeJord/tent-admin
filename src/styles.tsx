@@ -4,7 +4,7 @@ export const Root = styled.div`
   background-color: #eaf3e7;
   height: auto;
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
