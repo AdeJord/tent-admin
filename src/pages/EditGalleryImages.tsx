@@ -1,229 +1,124 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Button, Modal, message } from 'antd';
 import axios from 'axios';
-import Modal from '../components/modal/Modal';
-import DangerModal from '../components/modal/DangerModal';
-import Backdrop from '../components/modal/ModalBackdrop';
-import { Root, FormRoot, FormContainer, Button } from '../styles';
+import styled from 'styled-components';
 
-const BASE_URL = 'https://adejord.co.uk'; // Replace with your API base URL
+const BASE_URL = 'https://adejord.co.uk';
 
-const fetchGalleryImages = async (imageId: string) => {
-    try {
-        // Ensure BASE_URL is defined correctly, typically something like 'https://adejord.co.uk'
-        const response = await axios.get(`${BASE_URL}/news/${imageId}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching news data', error);
-        throw error;
-    }
-};
-
-
-//ISSUE IS HERE
-const updateNewsData = async (newsId: string | undefined, formData: { title: string; content: string; image_path: string; date: string; }) => {
-    try {
-        console.log(`News id = ${BASE_URL}/updateNews/${newsId}`)
-
-        const response = await axios.patch(`${BASE_URL}/updateNews/${newsId}`, formData);
-        return response.data;
-    } catch (error) {
-        console.error('Error editing news', error);
-        throw error;
-    }
-};
-
-const deleteNewsData = async (newsId: string | undefined) => {
-    try {
-        console.log(`News id = ${BASE_URL}/updateNews/${newsId}`)
-
-        const response = await axios.delete(`${BASE_URL}/news/${newsId}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error deleting news', error);
-        throw error;
-    }
+interface Image {
+  id: number;
+  // other properties
 }
 
-const EditNews = () => {
-    const { newsId } = useParams();
-    const navigate = useNavigate();
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [showDangerModal, setShowDangerModal] = useState(false);
+const ImgContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+`;
 
-    const [formData, setFormData] = useState({
-        title: '',
-        content: '',
-        image_path: '',
-        date: ''
-    });
+const ImgWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+  margin: 16px;
 
-    useEffect(() => {
-        if (!newsId) {
-            console.error('No News Id provided');
-            return;
+  img {
+    max-width: 150px;
+    max-height: 150px;
+  }
+
+  button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+`;
+
+interface Image {
+  id: number;
+  file_path: string;
+}
+
+const ImageGalleryManager: React.FC = () => {
+  const [images, setImages] = useState<Image[]>([]);
+
+  const getImages = async () => {
+    try {
+      const response = await axios.get<Image[]>(`${BASE_URL}/galleryImages`);
+      setImages(response.data);
+    } catch (error) {
+      console.error('Error fetching images:', error);
+      message.error('Failed to load images');
+    }
+  };
+
+  const deleteImage = async (imageId: number) => {
+    if (!Number.isInteger(imageId)) {
+        message.error('Invalid image ID');
+        console.error('Invalid image ID:', imageId);
+        return;
+    }
+
+    try {
+        console.log(`Deleting image with ID: ${imageId}`);
+
+        const response = await axios.delete(`${BASE_URL}/galleryImages/${imageId}`);
+        if (response.status === 200) {
+            message.success('Image deleted successfully');
+            // Assuming setImages is a state update function in your component
+            setImages((prevImages: Image[]) => prevImages.filter(img => img.id !== imageId));
+        } else {
+            message.error('Failed to delete image');
+            console.error(`Unexpected status code: ${response.status}`, response);
         }
-
-        fetchGalleryImages(newsId)
-            .then((fetchedData) => {
-                const formattedData = {
-                    ...fetchedData,
-                    date: fetchedData.date.split('T')[0] // Assumes the date is in ISO format
-                };
-                setFormData(formattedData);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    }, [newsId]);
-
-
-    const handleInputChange = (e: { target: { name: any; value: any; }; }) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
-    };
-
-    const handleSubmit = (e: { preventDefault: () => void; }) => {
-        e.preventDefault();
-        updateNewsData(newsId, formData)
-            .then(() => {
-                setShowSuccessModal(true);
-            })
-            .catch((error) => {
-                console.error('Error updating news', error);
-                setShowDangerModal(true);
-            });
-    };
-
-    const handleDelete = () => {
-        deleteNewsData(newsId)
-            .then(() => {
-                navigate(`/`);
-            })
-            .catch((error) => {
-                console.error('Error deleting news', error);
-                setShowDangerModal(true);
-            });
-    };
-
-    const handleCancel = () => {    
-        setShowDangerModal(false);
-    };
-
-    const handleDeleteSuccessModalClick = () => {
-        setShowSuccessModal(false); // Close the modal
-        // setShowSuccessDeleteModal(true); // Show the success modal on successful update
-        navigate(`/`); // Navigate to the desired page
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+        console.error('Error response headers:', error.response.headers);
+      } else if (axios.isAxiosError(error) && error.request) {
+        console.error('Error request data:', error.request);
+      } else {
+        const errorMessage = error as Error;
+        console.error('Error message:', errorMessage.message);
+      }
+      message.error('Failed to delete image');
     }
-
-    const handleCloseModal = () => {
-        setShowDangerModal(false); // Close the modal
-    }
-
-
-    // Function to convert file system path to web URL path
-    function toWebPath(internalPath: string) {
-        if (!internalPath) return '';
-        return internalPath.replace('/var/www', '');
-    }
-
-
-    return (
-        <Root>
-            <FormRoot
-                style={{
-                    paddingTop: '20px',
-                }}>
-                {showSuccessModal && (
-                    <Backdrop onClick={handleCloseModal}>
-                        <Modal
-                            header="Update Submitted"
-                            content="News item has been updated."
-                            onClick={() => navigate(`/`)} footer={undefined} />
-                    </Backdrop>
-                )}
-                {showDangerModal && (
-                    <Backdrop onClick={handleCloseModal}>
-                        <DangerModal
-                            header="Delete Confirmation"
-                            content="Are you sure you want to delete this news item? This action cannot be undone."
-                            footer={<div>
-                                <Button onClick={handleDelete}>DELETE</Button>
-                                <Button onClick={handleCancel}>CANCEL</Button>
-
-                            </div>} onClose={function (): void {
-                                throw new Error('Function not implemented.');
-                            } }
-                            // footer={<Button onClick={handleDelete}>DELETE</Button>}
-
-                            // onClick={() => setShowDangerModal(false)}
-                        />
-
-                    </Backdrop>
-                )}
-                <FormContainer
-                    style={{
-                        padding: '10px',
-                        paddingTop: '20px',
-
-                    }}>
-                    <form
-                        style={{
-                            padding: '10px',
-                            width: '80%',
-                        }}
-                        onSubmit={handleSubmit}>
-                        <label>Title:</label>
-                        <input
-                            type="text"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleInputChange}
-                        />
-                        <br />
-                        <br />
-
-                        <label>Content:</label>
-                        <textarea
-                            name="content"
-                            value={formData.content}
-                            onChange={handleInputChange}
-                            style={{
-                                height: '100px',
-                                width: '100%',
-                            }}
-                        />
-                        <br />
-                        <div>
-                            {formData.image_path && (
-                                <img
-                                    src={`https://adejord.co.uk${toWebPath(formData.image_path)}`}
-                                    alt="news"
-                                    style={{
-                                        width: '100%',
-                                        height: 'auto',
-                                    }}
-                                />
-                            )}
-                        </div>
-                        <br />
-                        <label>Date:</label>
-                        <input
-                            type="date"
-                            name="date"
-                            value={formData.date}
-                            onChange={handleInputChange}
-                        />
-                        <Button type="submit">Save Changes</Button>
-                        <Button type="button" onClick={() => setShowDangerModal(true)}>Delete</Button>
-                    </form>
-                </FormContainer>
-            </FormRoot>
-        </Root>
-    );
 };
 
-export default EditNews;
+
+  useEffect(() => {
+    getImages();
+  }, []);
+
+  return (
+    <div>
+      <h2>Manage Gallery Images</h2>
+      <ImgContainer>
+        {images.length > 0 ? (
+          images.map((img) => (
+            <ImgWrapper key={img.id}>
+              <img src={img.file_path} alt={`Gallery image ${img.id}`} />
+              <Button
+                type="primary"
+                danger
+                onClick={() => {
+                  Modal.confirm({
+                    title: 'Are you sure you want to delete this image?',
+                    onOk: () => deleteImage(img.id),
+                  });
+                }}
+              >
+                Delete
+              </Button>
+            </ImgWrapper>
+          ))
+        ) : (
+          <p>No images available.</p>
+        )}
+      </ImgContainer>
+    </div>
+  );
+};
+
+export default ImageGalleryManager;
