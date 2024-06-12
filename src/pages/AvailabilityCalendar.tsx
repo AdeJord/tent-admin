@@ -47,6 +47,13 @@ const AvailabilityCalendar: React.FC = () => {
       .then(data => setBookedDates(data))
       .catch(error => console.error('Error fetching data: ', error));
       console.log(bookedDates);
+      console.log(' type of booked dates - ', typeof bookedDates);
+
+// break the objects into an array of strings
+      const dates = Object.values(bookedDates);
+      console.log(dates);
+      console.log(' type of dates - ', typeof dates);
+
   }, []);
 
 

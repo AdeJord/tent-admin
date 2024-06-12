@@ -48,13 +48,13 @@ function Home() {
                     padding: '20px',
                 }}
             >
-                Upload documents and Gallery images to website
+                Upload documents to website
             </h2>
             <Container>
-                <UploadDiv>
+                {/* <UploadDiv>
                     Gallery Images
                     <FileUploader fileType='galleryImages' />
-                </UploadDiv>
+                </UploadDiv> */}
                 <UploadDiv>
                     T&C's
                     <FileUploader fileType='TCs' />

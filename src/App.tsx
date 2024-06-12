@@ -104,6 +104,7 @@ function App() {
               <Route path='/editNews/:newsId' element={<ProtectedRoute><EditNews /></ProtectedRoute>} />
 
               <Route path='/addGalleryImages' element={<ProtectedRoute><AddGalleryImages /></ProtectedRoute>} />
+              <Route path='/editGalleryImages' element={<ProtectedRoute><EditGalleryImages /></ProtectedRoute>} />
               <Route path='/editGalleryImages/:imageId' element={<ProtectedRoute><EditGalleryImages /></ProtectedRoute>} />
               {/* Add more routes here as needed */}
               {/* Redirect to Home if no route matches */}

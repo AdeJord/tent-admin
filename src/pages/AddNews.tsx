@@ -66,9 +66,6 @@ const AddNewsForm = () => {
         }
     };
     
-    
-    
-
     const normFile = (e: { fileList: any[]; }) => {
         console.log('Upload event:', e);
         if (Array.isArray(e)) {

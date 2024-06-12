@@ -308,17 +308,26 @@ const BookingEditPage = () => {
                 )}
 
                 <h1>Edit Booking</h1>
+
                 <FormContainer>
+                <p> Date </p>
+
                     <Formik
                         initialValues={formData}
                         validationSchema={schema}
                         onSubmit={handleSubmit}
                         enableReinitialize
                     >
+   
                         {({ values, handleChange }) => (
                             <>
-                                {console.log('Rendering Formik form')} {/* Debug statement */}
+
+                                {/* {console.log('Rendering Formik form')} Debug statement */}
                                 <Form style={{ display: "flex", flexDirection: "column", paddingTop: "2vh", height: "auto", width: "30vw" }}>
+                                <Label>Date</Label>
+                                <Field type="date" name="booking_date" as={Input} onChange={handleChange} />
+                                                                    
+                                    
                                     <Label>First Name:</Label>
                                     <Field type="text" name="first_name" as={Input} />
                                     <ErrorMessage name="first_name" component="div" />

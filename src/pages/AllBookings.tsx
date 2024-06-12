@@ -291,6 +291,9 @@ const AllBookings = () => {
             </tbody>
           </Table>
         </TableContainer>
+        <button>Export ALL to excel</button>
+        <button>Export GDPR compliant list</button>
+        <p>Email list GDPR compliant list to all required</p>
       </>
     </Root>
   );

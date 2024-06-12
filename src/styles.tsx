@@ -37,7 +37,7 @@ export const FormRoot = styled.div`
 `;
 
 export const FormContainer = styled.div`
-  background-color: gray;
+  background-color: #f5f7f0;
   border: 1px solid #dcdcdc;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -137,33 +137,6 @@ export const ButtonContainer = styled.div`
 `;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export const Header = styled.div`
   display: flex;
   flex-direction: row; 
@@ -227,31 +200,6 @@ export const HeaderSideDiv = styled.div`
     margin-top: 10px;
   }
 `;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 export const Container = styled.div`
@@ -677,3 +625,72 @@ export const NarrowInput = styled(Input)`
   margin-bottom: 8px;
 `;
 
+export const AllBookingActions = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 20px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 5px;
+  }
+`;
+
+export const BookingActionButtons = styled.div`
+  margin: 1rem;
+  padding: 1rem;
+  background-color: #c9edbb;
+  color: black;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 25%;
+
+  @media (max-width: 1024px) {
+    width: 35%;
+  }
+
+  @media (max-width: 768px) {
+    width: 50%;
+    margin: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  @media (max-width: 480px) {
+    width: 70%;
+    margin: 0.5rem;
+    padding: 0.5rem;
+  }
+`;
+
+export const AllBookingsHeaderDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 20px;
+  width: 100%;
+  font-family: "Roboto, Arial, Helvetica, sans-serif";
+  font-size: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 5px;
+  }
+`;

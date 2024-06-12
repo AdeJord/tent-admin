@@ -232,7 +232,8 @@ const CreateBooking: React.FC = () => {
   // Helper function to handle modal click
   const ModalClickHandler = () => {
     setShowModal(false);
-    navigate('/');
+    navigate('/')
+    window.scrollTo(0, 0);
   };
 
   // Helper function to get lunch arrangement description
@@ -366,7 +367,8 @@ const CreateBooking: React.FC = () => {
   }, [selectedDate, setValue]);
 
   return (
-    <>
+    <FormRoot>
+
       {showModal && (
         <>
           <Backdrop onClick={ModalClickHandler}>
@@ -381,11 +383,17 @@ const CreateBooking: React.FC = () => {
       )}
       <h1>Internal Booking Form</h1>
       <FormContainer>
-        <form onSubmit={handleSubmit(submitBooking)}>
+        <form
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            paddingTop: "2vh",
+            height: "auto",
+            width: "30vw",
+          }}
+          onSubmit={handleSubmit(submitBooking)}>
           <>
-            <>
-              Booking Date {/* Render label as a paragraph */}
-            </>
+            Booking Date {/* Render label as a paragraph */}
           </>
           <div style={{ textAlign: "center" }}>
             {selectedDate
@@ -398,7 +406,7 @@ const CreateBooking: React.FC = () => {
           {errors.first_name && (
             <ErrorMessage>{errors.first_name.message}</ErrorMessage>
           )}
-
+          <br />
           <Label>Surname</Label>
           <Input {...register("surname")} autoComplete="family-name" />
           {errors.surname && (
@@ -407,6 +415,7 @@ const CreateBooking: React.FC = () => {
 
           <Label>Group/Organisation Name (If applicable)</Label>
           <Input {...register("group_name")} />
+          <br />
 
           <Label>Contact Number</Label>
           <Input
@@ -417,7 +426,7 @@ const CreateBooking: React.FC = () => {
           {errors.contact_number && (
             <ErrorMessage>{errors.contact_number.message}</ErrorMessage>
           )}
-
+          <br />
           <Label>Email</Label>
           <Input
             type="email"
@@ -427,33 +436,33 @@ const CreateBooking: React.FC = () => {
           {errors.email_address && (
             <ErrorMessage>{errors.email_address.message}</ErrorMessage>
           )}
-
+          <br />
           <Label>House Number</Label>
           <Input {...register("house_number")} autoComplete="address-line1" />
           {errors.house_number && (
             <ErrorMessage>{errors.house_number.message}</ErrorMessage>
           )}
-
+          <br />
           <Label>Street Name</Label>
           <Input {...register("street_name")} autoComplete="address-line2" />
           {errors.street_name && (
             <ErrorMessage>{errors.street_name.message}</ErrorMessage>
           )}
-
+          <br />
           <Label>City</Label>
           <Input {...register("city")} autoComplete="address-level2" />
           {errors.city && <ErrorMessage>{errors.city.message}</ErrorMessage>}
-
+          <br />
           <Label>Postcode</Label>
           <NarrowInput {...register("postcode")} autoComplete="postal-code" />
           {errors.postcode && (
             <ErrorMessage>{errors.postcode.message}</ErrorMessage>
           )}
-
+          <br />
           <Label>Total Passengers (Max 12)</Label>
           <Input type="number" {...register("total_passengers")} />
           {errors.total_passengers && <p>{errors.total_passengers.message}</p>}
-
+          <br />
           <Label>Wheelchair Users (Max 2)</Label>
           <Input type="number" {...register("wheelchair_users")} />
           {errors.wheelchair_users && <p>{errors.wheelchair_users.message}</p>}
@@ -544,7 +553,7 @@ const CreateBooking: React.FC = () => {
           <label>
             <input type="checkbox" {...register("terms_and_conditions")} />
             <Link href="/TermsAndCond">
-              I have read and agree to the terms and conditions{" "}
+              Terms and Conditions agreed{" "}
             </Link>
             {errors.terms_and_conditions && (
               <p style={{ color: "red" }}>
@@ -556,7 +565,7 @@ const CreateBooking: React.FC = () => {
           <label>
             <input type="checkbox" {...register("group_leader_policy")} />
             <Link href="/GroupLeaderPolicy">
-              I have read and agree to the group leader policy{" "}
+              Group Leader policy agreed{" "}
             </Link>
             {errors.group_leader_policy && (
               <p style={{ color: "red" }}>
@@ -606,7 +615,7 @@ const CreateBooking: React.FC = () => {
           <FormButton type="submit">Submit</FormButton>
         </form>
       </FormContainer>
-    </>
+    </FormRoot>
   );
 };
 
