@@ -70,6 +70,7 @@ export const Input = styled.input`
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
+  text-align: center;
 
   @media (max-width: 600px) {
     // width: calc(100% - 0.8rem);

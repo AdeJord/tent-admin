@@ -1,9 +1,47 @@
 import { Root, Container, ContainerPartition, UploadDiv } from '../styles';
 import { Link } from 'react-router-dom';
 import FileUploader from '../components/FileUploader';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import UpdatePrices from '../components/UpdatePrices';
 
+const BASE_URL = 'https://adejord.co.uk';
+
+const getCurrentPrices = async () => {
+    try {
+        const response = await axios.get(`${BASE_URL}/prices`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching prices:', error);
+        throw error;
+    }
+}
+
+const submitNewPrices = async (newPrices: { trip1: number, trip2: number, trip3: number, trip4: number, trip5: number, trip6: number }) => {
+    try {
+        const response = await axios.patch(`${BASE_URL}/prices`, newPrices);
+        return response.data;
+    } catch (error) {
+        console.error('Error submitting new prices:', error);
+        throw error;
+    }
+}
 
 function Home() {
+    const [prices, setPrices] = useState(null);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        getCurrentPrices()
+            .then((prices) => {
+                setPrices(prices);
+            })
+            .catch((error) => {
+                setError(error);
+                console.error('Error fetching prices:', error);
+            });
+    }, []);
+
     return (
         <Root>
             <Container>
@@ -51,20 +89,14 @@ function Home() {
                 Upload documents to website
             </h2>
             <Container>
-                {/* <UploadDiv>
-                    Gallery Images
-                    <FileUploader fileType='galleryImages' />
-                </UploadDiv> */}
                 <UploadDiv>
                     T&C's
                     <FileUploader fileType='TCs' />
                 </UploadDiv>
-
                 <UploadDiv>
                     Boat Brochure
                     <FileUploader fileType='boatBrochure' />
                 </UploadDiv>
-
                 <UploadDiv>
                     Group Leader Policy
                     <FileUploader fileType='groupLeaderPolicy' />
@@ -72,7 +104,7 @@ function Home() {
             </Container>
             <Container>
                 <UploadDiv>
-                    Risk Assesments
+                    Risk Assessments
                     <FileUploader fileType='riskAssessments' />
                 </UploadDiv>
                 <UploadDiv>
@@ -88,12 +120,12 @@ function Home() {
                     <FileUploader fileType='insuranceCertificate' />
                 </UploadDiv>
             </Container>
-            {/* <h2>Update Booking Prices</h2>
-            <p>Coven </p><input type='number' />
-            <p>Autherley = ?</p><input type='number' />
-            <p>HAG = ?</p><input type='number' /> */}
+            <h2>Update Booking Prices</h2>
+            <UpdatePrices />
+            {error && <p style={{ color: 'red' }}>Error fetching prices: {(error as any).message}</p>}
+            <br />
         </Root>
     );
 }
 
-export default Home
+export default Home;
