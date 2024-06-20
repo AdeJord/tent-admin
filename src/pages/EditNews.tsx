@@ -20,7 +20,6 @@ const fetchNewsData = async (newsId: string) => {
 };
 
 
-//ISSUE IS HERE
 const updateNewsData = async (newsId: string | undefined, formData: { title: string; content: string; image_path: string; date: string; }) => {
     try {
         console.log(`News id = ${BASE_URL}/updateNews/${newsId}`)

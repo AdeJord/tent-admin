@@ -1,3 +1,6 @@
+import axios from 'axios';
+
+
 export interface Prices {
     id: number;
     trip1: number;
@@ -16,17 +19,13 @@ export interface Prices {
     return response.json();
   };
   
-  export const updatePrice = async (id: number, updatedPrices: Omit<Prices, 'id'>): Promise<void> => {
-    const response = await fetch(`https://adejord.co.uk/updatePrices/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updatedPrices),
-    });
-  
-    if (!response.ok) {
-      throw new Error('Failed to update price');
+  export const updatePrice = async (id: number, priceData: Prices) => {
+    try {
+      const response = await axios.patch(`/updatePrices/${id}`, priceData);
+      return response.data; // Assuming the backend returns the updated row
+    } catch (error) {
+      console.error('Error updating price:', error);
+      throw error;
     }
   };
   

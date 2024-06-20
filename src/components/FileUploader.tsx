@@ -37,6 +37,12 @@ const FileUploader: React.FC<FileUploaderProps> = ({ fileType, onSuccess, onErro
   const handleFileChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Validate the file type
+      if (file.type !== 'application/pdf' || !file.name.match(/\.pdf$/)) {
+        message.error('Only PDF files are allowed');
+        return; // Do not proceed with the upload
+      }
+
       uploadFile(file, fileType, onSuccess, onError); // Pass the fileType from props and the callbacks
       event.target.value = ''; // Reset the file input after upload
     }

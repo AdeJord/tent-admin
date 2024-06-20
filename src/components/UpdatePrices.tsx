@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { fetchAllPrices, updatePrice, Prices } from './pricesAPI';
-import { Input } from '../styles'
+import { Input } from '../styles';
+import { Modal } from 'antd';
+
 
 const UpdatePrices: React.FC = () => {
   const [prices, setPrices] = useState<Prices[]>([]);
@@ -28,12 +30,15 @@ const UpdatePrices: React.FC = () => {
     setPrices(newPrices);
   };
 
+
   const handleUpdate = async (index: number) => {
     try {
       const priceToUpdate = prices[index];
-      await updatePrice(priceToUpdate.id, priceToUpdate);
-      const updatedData = await fetchAllPrices();
-      setPrices(updatedData);
+      const updatedPrice = await updatePrice(priceToUpdate.id, priceToUpdate); // Ensure updatePrice returns the updated row
+      const updatedPrices = [...prices];
+      updatedPrices[index] = updatedPrice;
+      setPrices(updatedPrices);
+      Modal.success({ content: 'Price updated successfully!' });
     } catch (err) {
       setError('Failed to update price');
     }
@@ -58,7 +63,7 @@ const UpdatePrices: React.FC = () => {
             borderRadius: '5px',
             textAlign: 'center',
           }}
-          key={index}
+          key={price.id}
         >
           <div>
             <span>Coven with Pub Meal:<br /></span>
@@ -106,7 +111,8 @@ const UpdatePrices: React.FC = () => {
               type="number"
               value={price.trip5}
               onChange={(e) => handleInputChange(index, 'trip5', parseFloat(e.target.value))}
-            /><br />
+            />
+            <br />
             <button onClick={() => handleUpdate(index)}>Update</button>
           </div>
           <br />
