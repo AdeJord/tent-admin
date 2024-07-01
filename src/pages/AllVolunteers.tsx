@@ -29,20 +29,16 @@ const AllVolunteers = () => {
   const [data, setData] = useState<Booking[]>([]); // Initialize data as an empty array
 
   useEffect(() => {
-    // console.log("fetch started"); // Log the start of function
     axios
       .get("https://adejord.co.uk/volunteers")
       .then((response) => {
-        // console.log("API Response:", response.data); // Log the response
         setData(response.data);
 
-        // console.log("Data:", response.data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
         console.error('Error details:', error.response);
       });
-    // { console.log(getBookingsForMonth(targetMonth)) }
   }, []);
 
   return (

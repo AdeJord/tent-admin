@@ -22,8 +22,6 @@ const fetchNewsData = async (newsId: string) => {
 
 const updateNewsData = async (newsId: string | undefined, formData: { title: string; content: string; image_path: string; date: string; }) => {
     try {
-        console.log(`News id = ${BASE_URL}/updateNews/${newsId}`)
-
         const response = await axios.patch(`${BASE_URL}/updateNews/${newsId}`, formData);
         return response.data;
     } catch (error) {
@@ -34,8 +32,6 @@ const updateNewsData = async (newsId: string | undefined, formData: { title: str
 
 const deleteNewsData = async (newsId: string | undefined) => {
     try {
-        console.log(`News id = ${BASE_URL}/updateNews/${newsId}`)
-
         const response = await axios.delete(`${BASE_URL}/news/${newsId}`);
         return response.data;
     } catch (error) {

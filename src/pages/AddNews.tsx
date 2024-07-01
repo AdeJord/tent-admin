@@ -39,18 +39,14 @@ const AddNewsForm = () => {
     
             // First, check if the response is okay
             if (response.ok) {
-                console.log("News item added successfully");
-                console.log('From Data:', formData);
                 // Check the content type to decide how to process it
                 const contentType = response.headers.get('content-type');
                 if (contentType && contentType.includes('application/json')) {
                     // Read the response as JSON if it's JSON
                     const responseData = await response.json();
-                    console.log('Response Data:', responseData);
                 } else {
                     // If not JSON, read as text
                     const responseText = await response.text(); // Read only once here
-                    console.log('Non-JSON Response:', responseText);
                 }
     
                 form.resetFields();  // Clear the form after successful submission
@@ -58,7 +54,6 @@ const AddNewsForm = () => {
             } else {
                 // If the server response is not OK, log and handle it
                 const errorText = await response.text();  // Read the response as text to log it
-                console.log('Failed Response:', errorText);
                 throw new Error('Failed to submit news item');
             }
         } catch (error) {
@@ -67,7 +62,6 @@ const AddNewsForm = () => {
     };
     
     const normFile = (e: { fileList: any[]; }) => {
-        console.log('Upload event:', e);
         if (Array.isArray(e)) {
             return e;
         }

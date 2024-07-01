@@ -46,13 +46,9 @@ const AvailabilityCalendar: React.FC = () => {
       .then(response => response.json())
       .then(data => setBookedDates(data))
       .catch(error => console.error('Error fetching data: ', error));
-      console.log(bookedDates);
-      console.log(' type of booked dates - ', typeof bookedDates);
 
 // break the objects into an array of strings
       const dates = Object.values(bookedDates);
-      console.log(dates);
-      console.log(' type of dates - ', typeof dates);
 
   }, []);
 
@@ -74,14 +70,11 @@ const AvailabilityCalendar: React.FC = () => {
     const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
     const dateString = localDate.toISOString().split('T')[0];
   
-    console.log(`Date clicked: ${dateString}`);
-    console.log(`Booked dates: ${bookedDates}`);
   
     if (!bookedDates.includes(dateString)) {
-      console.log('Navigating to CreateBooking');
       navigate(`/CreateBooking?date=${dateString}`);
     } else {
-      console.log('This date is booked and cannot be selected.');
+      console.log('This date is booked and cannot be selected and needs a modal!.');
     }
   };
   

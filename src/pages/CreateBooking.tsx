@@ -20,7 +20,6 @@ import * as yup from "yup";
 import Modal from "../components/modal/Modal";
 import Backdrop from "../components/modal/ModalBackdrop";
 
-
 interface FormData {
   first_name: string;
   surname: string;
@@ -61,13 +60,10 @@ const isBookingDateAvailable = async (date: string) => {
       return false;
     }
 
-    //Get booked dates from the API
+    // Get booked dates from the API
     const response = await axios.get(`https://adejord.co.uk/dates?date=${date}`);
     const bookedDates = response.data;
-    // console.log('Selected Date:', selectedDate);
-    // console.log('Booked Dates:', bookedDates);
     const isDateBooked = bookedDates.some((bookedDate: string) => new Date(bookedDate).getTime() === selectedDate.getTime());
-    // console.log('Is Date Booked:', isDateBooked);
 
     return !isDateBooked;
   } catch (error) {
@@ -75,7 +71,6 @@ const isBookingDateAvailable = async (date: string) => {
     return false;
   }
 };
-
 
 // Define the schema for form validation
 const schema = yup.object().shape({
@@ -97,7 +92,6 @@ const schema = yup.object().shape({
       test: function (value) {
         const currentDate = new Date();
         const selectedDate = new Date(value);
-
         return selectedDate > currentDate;
       },
     })
@@ -137,14 +131,11 @@ const schema = yup.object().shape({
   adminOther: yup.string().notRequired(),
 });
 
-
-
 type MyResolverType = Resolver<FormData, typeof yupResolver>;
 
 const CreateBooking: React.FC = () => {
   const [showModal, setShowModal] = React.useState<boolean>(false);
   const [formData, setFormData] = React.useState<FormData | null>(null);
-  const [selectedDestination, setSelectedDestination] = React.useState<string | null>(null);
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [skippers, setSkippers] = useState<string[]>([]);
   const [crew1, setCrew1] = useState<string[]>([]);
@@ -157,13 +148,11 @@ const CreateBooking: React.FC = () => {
   const queryParams = new URLSearchParams(location.search);
   const selectedDate = queryParams.get('date');
 
-
   // fetch list of volunteers from adejord.co.uk/volunteers
   useEffect(() => {
     const fetchVolunteers = async () => {
       try {
         const response = await axios.get("https://adejord.co.uk/volunteers");
-        console.log("API Response:", response.data); // Log to confirm the response data
         setVolunteers(response.data);
       } catch (error) {
         console.error("Error fetching volunteers:", error);
@@ -172,67 +161,33 @@ const CreateBooking: React.FC = () => {
     fetchVolunteers();
   }, []);
 
-  // filter skippers, crew1 and crew2 from volunteers for asigning crew dropdowns
+  // filter skippers, crew1 and crew2 from volunteers for assigning crew dropdowns
   useEffect(() => {
-    console.log("Volunteers for filtering:", volunteers); // Log to check volunteers before filtering
-
     const filteredSkippers = volunteers
-      .filter(volunteer => {
-        if (volunteer.role) {
-          const role = volunteer.role.trim().toLowerCase();
-          // console.log("Checking volunteer role (trimmed and lowercased):", role); // Log each volunteer's role
-          return role === 'skipper';
-        } else {
-          console.log("Volunteer with no role or null role:", volunteer);
-          return false;
-        }
-      })
+      .filter(volunteer => volunteer.role?.trim().toLowerCase() === 'skipper')
       .map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
-    // console.log("Filtered Skippers:", filteredSkippers); // Log the filtered result
     setSkippers(filteredSkippers);
 
     const filteredCrew1 = volunteers
-      .filter(volunteer => {
-        if (volunteer.role) {
-          const role = volunteer.role.trim().toLowerCase();
-          return role === 'crew1';
-        } else {
-          return false;
-        }
-      })
+      .filter(volunteer => volunteer.role?.trim().toLowerCase() === 'crew1')
       .map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
     setCrew1(filteredCrew1);
 
     const filteredCrew2 = volunteers
-      .filter(volunteer => {
-        if (volunteer.role) {
-          const role = volunteer.role.trim().toLowerCase();
-          return role === 'crew2';
-        } else {
-          return false;
-        }
-      })
+      .filter(volunteer => volunteer.role?.trim().toLowerCase() === 'crew2')
       .map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
     setCrew2(filteredCrew2);
 
     const filteredAdminOther = volunteers
-      .filter(volunteer => {
-        if (volunteer.role) {
-          const role = volunteer.role.trim().toLowerCase();
-          return role === 'admin/other';
-        } else {
-          return false;
-        }
-      })
+      .filter(volunteer => volunteer.role?.trim().toLowerCase() === 'admin/other')
       .map(volunteer => `${volunteer.first_name} ${volunteer.surname}`);
     setAdminOther(filteredAdminOther);
   }, [volunteers]);
 
-
   // Helper function to handle modal click
   const ModalClickHandler = () => {
     setShowModal(false);
-    navigate('/')
+    navigate('/');
     window.scrollTo(0, 0);
   };
 
@@ -250,11 +205,11 @@ const CreateBooking: React.FC = () => {
     }
   };
 
-  //Helper to get the wheechair users message
+  // Helper to get the wheelchair users message
   const getWheelchairUsersDescription = (wheelchairUsers: number) => {
     switch (wheelchairUsers) {
       case 0:
-        return 'There are no wheelchair users on this trip Please let us know if this changes so we can have the lift ready.';
+        return 'There are no wheelchair users on this trip. Please let us know if this changes so we can have the lift ready.';
       case 1:
         return 'There is 1 wheelchair user on this trip. The lift will be ready for you.';
       case 2:
@@ -344,12 +299,12 @@ const CreateBooking: React.FC = () => {
     }
   };
 
-
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,  // Import setValue from useForm
+    watch,
+    setValue,
   } = useForm<FormData>({
     resolver: yupResolver(schema) as MyResolverType,
     defaultValues: {
@@ -358,6 +313,8 @@ const CreateBooking: React.FC = () => {
       booking_date: selectedDate || '', // Set the default value for booking_date
     },
   });
+
+  const selectedDestination = watch('destination');
 
   // Set the booking_date field value if selectedDate is available
   useEffect(() => {
@@ -368,7 +325,6 @@ const CreateBooking: React.FC = () => {
 
   return (
     <FormRoot>
-
       {showModal && (
         <>
           <Backdrop onClick={ModalClickHandler}>
@@ -467,7 +423,6 @@ const CreateBooking: React.FC = () => {
           <Input type="number" {...register("wheelchair_users")} />
           {errors.wheelchair_users && <p>{errors.wheelchair_users.message}</p>}
 
-
           <RadioGroup>
             <GroupLabel>Smoking</GroupLabel>
             <div>
@@ -519,6 +474,8 @@ const CreateBooking: React.FC = () => {
                 type="radio"
                 value="Fish and Chips"
                 {...register("lunch_arrangements")}
+                disabled={selectedDestination === 'Penkridge'}
+
               />{" "}
               Fish & Chips
             </RadioLabel>
@@ -527,6 +484,7 @@ const CreateBooking: React.FC = () => {
                 type="radio"
                 value="Pub Meal"
                 {...register("lunch_arrangements")}
+                disabled={selectedDestination === 'Autherley' || selectedDestination === 'Penkridge'}
               />{" "}
               Pub Meal
             </RadioLabel>

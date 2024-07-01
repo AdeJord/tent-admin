@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
+import EmailTripLists from "../components/EmailTripLists";
 import {
   Root,
   Table,
-  TableCell,
   Button,
   ButtonContainer,
   TableContainer
 } from "../styles";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { log } from "console";
+import ExportButton from '../components/ExportButton'; // Import the ExportButton component
 
 // Define an interface for the booking object
 interface Booking {
@@ -40,24 +40,21 @@ interface Booking {
   bookingmonth: string;
 }
 
-const AllBookings = () => {
+const AllBookings: React.FC = () => {
   const [data, setData] = useState<Booking[]>([]); // Initialize data as an empty array
 
-  //initialise the year as current year
+  // Initialize the year as current year
   const [year, setYear] = useState<number>(new Date().getFullYear());
 
-  //set the current month for initial render
+  // Set the current month for initial render
   const [currentMonth, setCurrentMonth] = useState<string>(
     new Date().toLocaleString("en-UK", { month: "long" })
   );
-  //set the target month (this is the one that will be displayed)
+  // Set the target month (this is the one that will be displayed)
   const [targetMonth, setTargetMonth] = useState<string>(currentMonth); // Initialize targetMonth as the current month
 
   // Function to filter bookings by month
   const getBookingsForMonth = (month: string) => {
-    // console.log('month:', month);
-    // console.log('data:', data);
-    // data.forEach(booking => console.log('booking:', booking));
     return data.filter((booking) => booking.bookingmonth === month);
   };
 
@@ -68,25 +65,35 @@ const AllBookings = () => {
     return dateA.getTime() - dateB.getTime();
   });
 
-
-
   useEffect(() => {
-    console.log("fetch all bookings started"); // Log the start of function
     axios
       .get("https://adejord.co.uk/bookings")
       .then((response) => {
-        // console.log("API Response:", response.data); // Log the response
         setData(response.data);
-        console.log("Data:", response.data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
         console.error('Error details:', error.response);
+        alert("Error fetching data");
       });
   }, [targetMonth]);
 
-
-
+  const handleSendEmail = async () => {
+    try {
+      const response = await axios.post('https://adejord.co.uk/send-all-bookings-GDPR', {
+        data,
+        targetMonth,
+        volunteers: [] // Declare the type of 'volunteers' as an array of any type
+      });
+      console.log('response:', response);
+      if (response.status === 200) {
+        alert('Email sent successfully');
+      }
+    } catch (error) {
+      console.error('Error sending email:', error);
+      alert('Error sending email');
+    }
+  }
 
   const handlePrevMonth = () => {
     let newTargetMonth;
@@ -139,7 +146,6 @@ const AllBookings = () => {
     setTargetMonth(newTargetMonth);
     setYear(newYear);
   };
-
 
   const handleNextMonth = () => {
     let newTargetMonth;
@@ -220,7 +226,6 @@ const AllBookings = () => {
         </ButtonContainer>
       </div>
       <>
-
         <TableContainer>
           <Table>
             <thead style={{ background: "gray" }}>
@@ -291,9 +296,13 @@ const AllBookings = () => {
             </tbody>
           </Table>
         </TableContainer>
-        <button>Export ALL to excel</button>
-        <button>Export GDPR compliant list</button>
-        <p>Email list GDPR compliant list to all required</p>
+        {/* Export buttons */}
+        <br />
+        <ExportButton label="Export ALL to Excel" data={data} isGdprCompliant={false} />
+        <br />
+        <ExportButton label="Export GDPR Compliant List" data={data} isGdprCompliant={true} />
+        <br />
+        <button onClick={handleSendEmail}>Email GDPR compliant list to all required</button>
       </>
     </Root>
   );

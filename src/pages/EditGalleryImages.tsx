@@ -60,8 +60,6 @@ const ImageGalleryManager: React.FC = () => {
     }
 
     try {
-        console.log(`Deleting image with ID: ${imageId}`);
-
         const response = await axios.delete(`${BASE_URL}/galleryImages/${imageId}`);
         if (response.status === 200) {
             message.success('Image deleted successfully');
