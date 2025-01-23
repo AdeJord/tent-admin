@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { useAuth } from '../components/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import DangerModal from '../components/modal/DangerModal';
 import Backdrop from '../components/modal/ModalBackdrop';
 import { Button } from '../styles';
+
+// Configure axios globally
+axios.defaults.withCredentials = true;
 
 const SignInPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -12,121 +14,109 @@ const SignInPage: React.FC = () => {
   const [showDangerModal, setShowDangerModal] = useState(false);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
+  const [modalContent, setModalContent] = useState<string>('');
 
-  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const ModalClickHandler: React.MouseEventHandler<HTMLDivElement> = (event) => {
-    event.preventDefault();  // Prevent the default action if necessary
-    setShowDangerModal(false);
+  // Function to reset failed attempts after blocking
+  const unblockUser = () => {
+    setIsBlocked(false);
+    setFailedAttempts(0);
   };
 
-  const handleDangerModalCancel = () => {
-    setShowDangerModal(false); // Close the modal
-  }
-
-  const modalContent = (`Atemptes remaining: ${3 - failedAttempts}  `);
-
-
+  // Handle login logic
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+   
     if (isBlocked) {
-      alert("Too many failed attempts. Please wait 30 seconds before trying again.");
+      setModalContent("Too many failed attempts. Please wait 30 seconds before trying again.");
+      setShowDangerModal(true);
       return;
     }
-
+   
     try {
-      await login(username, password);
-      navigate('/'); // Navigate to the homepage or dashboard upon successful login
-      setFailedAttempts(0); // Reset failed attempts on successful login
+      const response = await axios.post('https://adejord.co.uk/login', {
+        username,
+        password,
+      });
+   
+      // Store token and set default header
+      localStorage.setItem('token', response.data.token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+   
+      console.log('Login successful:', response.data);
+      navigate('/');
+      setFailedAttempts(0);
     } catch (error: any) {
       const newFailedAttempts = failedAttempts + 1;
       setFailedAttempts(newFailedAttempts);
-
+   
       if (newFailedAttempts >= 3) {
         setIsBlocked(true);
-        setTimeout(() => {
-          setIsBlocked(false); // Unblock after 30 seconds
-          setFailedAttempts(0); // Reset attempts after block is lifted
-        }, 30000); // 30 seconds
-      }
-
-      if (axios.isAxiosError(error)) {
-        setShowDangerModal(true);
-        console.error("Login failed:", error.response?.data.message || error.message);
+        setModalContent("You are locked out for 30 seconds. Please try again later.");
+        setTimeout(unblockUser, 30000);
       } else {
-        console.error("Login failed:", error.message);
+        setModalContent("Incorrect username or password. Attempts remaining: " + (3 - newFailedAttempts));
       }
+   
+      setShowDangerModal(true);
+      console.error("Login failed:", error.response?.data?.error || error.message);
     }
-  };
+   };
+
+  // Close modal handler
+  const handleModalClose = () => setShowDangerModal(false);
 
   return (
     <div style={{ paddingTop: '40px', textAlign: 'center' }}>
+      {/* Danger Modal for Errors */}
       {showDangerModal && (
-        <Backdrop onClick={handleDangerModalCancel}
-        >
+        <Backdrop onClick={handleModalClose}>
           <DangerModal
-            onClick={handleDangerModalCancel}
-            header="Incorrect username or password"
-            content={modalContent + "Please try again."}
-            footer={<div
-              style={{
-                backgroundColor: "#EAF3E7",
-                color: "#051101",
-                fontSize: "calc(5px + 2vmin)",
-                textAlign: "center",
-              }}>
-
-              <Button
-                onClick={handleDangerModalCancel}
-                type="submit"
-                style={{
-                  backgroundColor: "#EAF3E7",
-                  color: "#051101",
-                  fontSize: "calc(5px + 2vmin)",
-                  textAlign: "center",
-                }}
-              >OK</Button>
-            </div>} onClose={handleDangerModalCancel} />
+            onClick={handleModalClose}
+            header={isBlocked ? "Blocked" : "Login Error"}
+            content={modalContent}
+            footer={
+              <div style={{ textAlign: "center" }}>
+                <Button
+                  onClick={handleModalClose}
+                  style={{ backgroundColor: "#EAF3E7", color: "#051101", fontSize: "calc(5px + 2vmin)" }}
+                >
+                  OK
+                </Button>
+              </div>
+            }
+            onClose={handleModalClose}
+          />
         </Backdrop>
       )}
-      {isBlocked && (
-        <Backdrop onClick={handleDangerModalCancel}>
-          <DangerModal
-            onClick={handleDangerModalCancel}
-            header="Too many failed attempts"
-            content="You are locked out for 30 seconds. Please try again later."
-            footer={<div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                textAlign: "center",
-              }}>
 
-              <Button
-                onClick={handleDangerModalCancel}
-                type="submit"
-                style={{ backgroundColor: "#EAF3E7", color: "#051101", fontSize: "calc(5px + 2vmin)" }}
-              >OK</Button>
-            </div>} onClose={function (): void {
-              throw new Error('Function not implemented.');
-            }} />
-        </Backdrop>
-      )}
+      {/* Sign In Form */}
       <h1>Sign In</h1>
       <form onSubmit={handleSubmit}>
         <label>
           Username:
-          <input type="text" value={username} onChange={e => setUsername(e.target.value)} />
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            style={{ margin: '10px' }}
+          />
         </label>
         <br />
         <label>
           Password:
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ margin: '10px' }}
+          />
         </label>
         <br />
-        <button type="submit">Sign In</button>
+        <button type="submit" style={{ marginTop: '10px', padding: '10px 20px' }}>
+          Sign In
+        </button>
       </form>
     </div>
   );
