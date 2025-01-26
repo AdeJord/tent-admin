@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Route, Link, Navigate, Routes } from 'react-router-dom';
-import { useAuth } from './components/AuthContext'; // Ensure you import useAuth
-import SignInPage from './pages/SignIn'; // Ensure you have a SignInPage component
+import { useAuth } from './components/AuthContext';
+import SignInPage from './pages/SignIn';
 import Greeting from './components/Greeting';
-// Import all other components and pages as before
-
-import { Root, Header, HeaderSideDiv, HeaderDiv } from './styles';
+import { Root, Header, HeaderDiv, StyledGreeting } from './styles';
 import AllBookings from './pages/AllBookings';
 import AllVolunteers from './pages/AllVolunteers';
 import Home from './pages/Home';
@@ -21,24 +19,13 @@ import EditNews from './pages/EditNews';
 import AddGalleryImages from './pages/AddGalleryImages';
 import EditGalleryImages from './pages/EditGalleryImages';
 
-
 function App() {
-  const { isAuthenticated, logout } = useAuth(); // Use logout from auth context
+  const { isAuthenticated, logout } = useAuth();
   const userName = localStorage.getItem('userName');
-  const [loggedInName, setLoggedInName] = useState(userName);
-  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      setLoggedInName(localStorage.getItem('userName'));
-    } else {
-      setLoggedInName('');
-    }
-  }, [isAuthenticated]);
 
   const logOut = () => {
-    logout(); // Call logout from the auth context which should handle state changes
-    localStorage.clear(); // Clear local storage
+    logout();
+    localStorage.clear();
   };
 
   return (
@@ -46,75 +33,60 @@ function App() {
       <Root>
         <Header>
           <HeaderDiv>
-            {isAuthenticated && loggedInName && (
-              <>
-                <p style={{
-                  color: '#EAF3E7',
-                  fontSize: '15px'
-                }}>
-                  <Greeting 
-                  loggedInName={loggedInName} />
-                </p>
-                <Link to="/" style={{
-                  textDecoration: 'none',
-                  width: '60%',
-                  fontSize: '4vw',
-                  color: '#EAF3E7',
-                  textAlign: 'center',
-                }}>
-                  TENT ADMIN
-                </Link>
-                <Link
-                  onClick={logOut}
-                  to="/signin"
-                  style={{
-                    textDecoration: 'none',
-                    fontSize: '10px',
-                    color: '#EAF3E7'
-                  }}
-                >
-                  Sign Out
-                </Link>
-              </>
+            <Link to="/" style={{
+              textDecoration: 'none',
+              width: '60%',
+              fontSize: '4vw',
+              color: '#EAF3E7',
+              textAlign: 'center',
+            }}>
+              TENT ADMIN
+            </Link>
+
+            {isAuthenticated && (
+              <StyledGreeting>
+                <Greeting loggedInName={userName || ''} />
+              </StyledGreeting>
             )}
+            <Link
+              onClick={logOut}
+              to="/signin"
+              style={{
+                textDecoration: 'none',
+                fontSize: '10px',
+                color: '#EAF3E7',
+                visibility: isAuthenticated ? 'visible' : 'hidden'
+              }}
+            >
+              Sign Out
+            </Link>
           </HeaderDiv>
         </Header>
+
         <Routes>
-          {/* Conditionally render SignInPage or protected routes */}
+          <Route path="/signin" element={
+            isAuthenticated ? <Navigate to="/" replace /> : <SignInPage />
+          } />
+
           {isAuthenticated ? (
             <>
-              <Route path="/signin" element={<SignInPage />} />
               <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-
               <Route path='/createbooking' element={<ProtectedRoute><CreateBooking /></ProtectedRoute>} />
               <Route path="/allbookings" element={<ProtectedRoute><AllBookings /></ProtectedRoute>} />
               <Route path="/editBooking/:bookingId" element={<ProtectedRoute><BookingEditPage /></ProtectedRoute>} />
-
-
               <Route path="/allvolunteers" element={<ProtectedRoute><AllVolunteers /></ProtectedRoute>} />
               <Route path='/addvolunteers' element={<ProtectedRoute><AddVolunteers /></ProtectedRoute>} />
               <Route path="/editVolunteer/:volunteerId" element={<ProtectedRoute><EditVolunteers /></ProtectedRoute>} />
-
-
               <Route path="/AvailabilityCalendar" element={<ProtectedRoute><AvailabilityCalendar /></ProtectedRoute>} />
-
-
               <Route path='/addNews' element={<ProtectedRoute><AddNews /></ProtectedRoute>} />
               <Route path='/news' element={<ProtectedRoute><AllNews /></ProtectedRoute>} />
               <Route path='/editNews/:newsId' element={<ProtectedRoute><EditNews /></ProtectedRoute>} />
-
               <Route path='/addGalleryImages' element={<ProtectedRoute><AddGalleryImages /></ProtectedRoute>} />
               <Route path='/editGalleryImages' element={<ProtectedRoute><EditGalleryImages /></ProtectedRoute>} />
               <Route path='/editGalleryImages/:imageId' element={<ProtectedRoute><EditGalleryImages /></ProtectedRoute>} />
-              {/* Add more routes here as needed */}
-              {/* Redirect to Home if no route matches */}
             </>
           ) : (
-            <>
-              {/* Redirect all routes to SignInPage if not authenticated */}
-              <Route path="/signin" element={<SignInPage />} />
-              <Route path="*" element={<Navigate to="/signin" replace />} />
-            </>
+            <Route path="*" element={<Navigate to="/signin" replace />} />
           )}
         </Routes>
       </Root>
