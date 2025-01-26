@@ -1,5 +1,6 @@
 import styled from "./styled";
 
+
 export const Root = styled.div`
   background-color: #eaf3e7;
   height: auto;
@@ -145,13 +146,13 @@ export const Header = styled.div`
   justify-content: space-between; 
   width: 100%; 
   height: 10vh;
-  background-color: #051101;
+  background-color:rgb(1, 15, 17);
   color: #eaf3e7;
   font-family: "Roboto, Arial, sans-serif";
 
   @media (max-width: 768px) {
     height: 8vh;
-    flex-direction: column;  // Stack items vertically on smaller screens
+    flex-direction: column; 
   }
 `;
 
@@ -159,12 +160,40 @@ export const HeaderDiv = styled.div`
   display: flex;
   flex: 2 0 55%;
   align-items: center;
-  background-color: black; /* Ensure the background is black */
-  padding: 10px; /* Add padding to avoid content touching the edges */
+  background-color: black; 
+  padding: 10px; 
+  height: auto;
 
   @media (max-width: 768px) {
     flex: 1 0 100%;
     justify-content: center;
+  }
+`;
+
+export const MainTitle = styled.link`
+  text-decoration: none;
+  width: 60%;
+  font-size: clamp(24px, 4vw, 48px);
+  color: #EAF3E7;
+  text-align: center;
+`;
+
+
+export const SignOutLink = styled.link`
+  text-decoration: none;
+  font-size: 14px;
+  color: #EAF3E7;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+    padding: 6px 12px;
   }
 `;
 

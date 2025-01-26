@@ -88,8 +88,6 @@ const updateBookingData = async (bookingId: number, formData: FormData) => {
             booking_date: new Date(formData.booking_date).toISOString(), // Convert to ISO string for server
         };
         const response = await axios.patch(`${BASE_URL}/updateBooking/${bookingId}`, dataToSend);
-        console.log('Form Data:', dataToSend);
-        console.log('Response:', response.data);
         return response.data;
     } catch (error) {
         console.log('Error editing booking:', error);
@@ -206,7 +204,6 @@ const BookingEditPage = () => {
 
         fetchBookingData(bookingId)
             .then((fetchedData) => {
-                console.log('Fetched Data:', fetchedData); // Debug statement
                 fetchedData.booking_date = new Date(fetchedData.booking_date).toISOString().split('T')[0]; // Format the date for input
                 setFormData(fetchedData);
             })
@@ -216,11 +213,9 @@ const BookingEditPage = () => {
     }, [bookingId]);
 
     const handleSubmit = async (values: FormData) => {
-        console.log('Form values on submit:', values); // Debug statement
         try {
             await updateBookingData(Number(bookingId), values);
             setShowSuccessModal(true);
-            console.log('Booking Data', values);
         } catch (error) {
             if (error instanceof Error) {
                 console.error("Error in BookingEditPage:", error.message);

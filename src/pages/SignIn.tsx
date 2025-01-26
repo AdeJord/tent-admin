@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import DangerModal from '../components/modal/DangerModal';
 import Backdrop from '../components/modal/ModalBackdrop';
 import { Button } from '../styles';
-
-// Configure axios globally
-axios.defaults.withCredentials = true;
+import { useAuth } from '../components/AuthContext';
 
 const SignInPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -15,16 +12,14 @@ const SignInPage: React.FC = () => {
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
   const [modalContent, setModalContent] = useState<string>('');
-
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  // Function to reset failed attempts after blocking
   const unblockUser = () => {
     setIsBlocked(false);
     setFailedAttempts(0);
   };
 
-  // Handle login logic
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
    
@@ -35,19 +30,10 @@ const SignInPage: React.FC = () => {
     }
    
     try {
-      const response = await axios.post('https://adejord.co.uk/login', {
-        username,
-        password,
-      });
-   
-      // Store token and set default header
-      localStorage.setItem('token', response.data.token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-   
-      console.log('Login successful:', response.data);
+      await login(username, password);
       navigate('/');
-      setFailedAttempts(0);
     } catch (error: any) {
+      console.error('Login error:', error);
       const newFailedAttempts = failedAttempts + 1;
       setFailedAttempts(newFailedAttempts);
    
@@ -60,16 +46,13 @@ const SignInPage: React.FC = () => {
       }
    
       setShowDangerModal(true);
-      console.error("Login failed:", error.response?.data?.error || error.message);
     }
-   };
+  };
 
-  // Close modal handler
   const handleModalClose = () => setShowDangerModal(false);
 
   return (
     <div style={{ paddingTop: '40px', textAlign: 'center' }}>
-      {/* Danger Modal for Errors */}
       {showDangerModal && (
         <Backdrop onClick={handleModalClose}>
           <DangerModal
@@ -91,7 +74,6 @@ const SignInPage: React.FC = () => {
         </Backdrop>
       )}
 
-      {/* Sign In Form */}
       <h1>Sign In</h1>
       <form onSubmit={handleSubmit}>
         <label>
